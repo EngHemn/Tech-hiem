@@ -29,7 +29,7 @@ const CardTeam = ({
   return (
     <motion.div
       id={name}
-      className="flex flex-col items-center justify-center gap-4 w-full md:w-[300px] h-auto border rounded-3xl shadow-lg p-6 hover:shadow-xl transition-all"
+      className="flex flex-col items-center justify-center gap-1 w-full md:w-[220px] h-auto border rounded-3xl shadow-lg p-3 hover:shadow-xl transition-all"
       variants={cardVariants}
       initial="hidden"
       whileInView="visible"
@@ -51,7 +51,7 @@ const CardTeam = ({
       </motion.div>
 
       <motion.h2
-        className="text-lg font-semibold text-gray-800"
+        className="text-17 font-semibold text-gray-800"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
@@ -61,7 +61,7 @@ const CardTeam = ({
 
       {/* Role */}
       <motion.h3
-        className="text-md font-medium text-gray-600"
+        className="text-14 line-clamp-1 font-medium text-gray-600"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
@@ -71,15 +71,12 @@ const CardTeam = ({
 
       {/* Description */}
       <motion.p
-        className="text-sm text-gray-600 text-center"
+        className="text-12 text-gray-600 text-center line-clamp-3"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
       >
         {description || "No description provided."}
-        perferendis laboriosam eos numquam natus consectetur saepe
-        necessitatibus consequatur veniam voluptatem ab veritatis, tenetur
-        aliquam a.
       </motion.p>
 
       {/* Dashboard Buttons */}

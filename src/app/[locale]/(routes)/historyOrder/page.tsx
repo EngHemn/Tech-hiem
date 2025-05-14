@@ -3,7 +3,6 @@ import { Loader } from "@/app/[locale]/loader";
 import { useUser } from "@clerk/nextjs";
 
 import React from "react";
-import CardHistory from "./_compoents/CardHistory";
 import { motion, sync } from "framer-motion";
 import { getOrder } from "@/lib/action/dashboard";
 import { useQuery } from "@tanstack/react-query";
