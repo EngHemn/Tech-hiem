@@ -126,7 +126,11 @@ interface ProductFormInput {
   isDiscount: boolean;
   bigimageUrl: string;
   numSearch: number;
+  stock: number;
+  iniPrice: number;
+  isev: boolean;
   smallimageUrl: string[];
+  isProduction: boolean;
 }
 type CategoryImage = {
   fileName: string;
@@ -284,6 +288,7 @@ export type OrderType = {
   totalAmount: number; // Total cost for the order
   totaldiscountPrice: number;
   note?: string; // Optional notes provided by the user
+  view: boolean;
 };
 export interface favorite {
   id?: string;

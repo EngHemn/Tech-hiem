@@ -105,6 +105,7 @@ const Page = () => {
         totalAmount: totalPrice?.totalPrice || 0, // Default to 0 if totalPrice is not defined
         userId: user?.id || "", // Ensure user is defined
         note: data.note ? (data.note as string) : undefined, // Use undefined if no note is provided
+        view: false,
       };
 
       mutate({ orders });

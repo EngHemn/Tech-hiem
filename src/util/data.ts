@@ -31,17 +31,23 @@ import {
   FaShoppingCart,
   FaEnvelope,
   FaQuestionCircle,
+  FaShoppingBag,
+  FaInfoCircle,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import type { LocalizationResource } from "@clerk/types";
 import {
+  MdAccountBalance,
+  MdAddCircle,
   MdAddCircleOutline,
+  MdCategory,
   MdOutlineShoppingCart,
   MdOutlineVerified,
   MdShoppingBasket,
 } from "react-icons/md";
 import { MenuItemProps, User } from "@nextui-org/react";
-import { BiCategoryAlt, BiSolidTimer } from "react-icons/bi";
-import { FaUsersLine } from "react-icons/fa6";
+import { BiCategoryAlt, BiSolidFactory, BiSolidTimer } from "react-icons/bi";
+import { FaNewspaper, FaPercent, FaUsers, FaUsersLine } from "react-icons/fa6";
 
 const newProdcuts: Productsprops[] = [
   {
@@ -279,41 +285,18 @@ const filterItems: FilterProps[] = [
   { name: "color", item: ["white", "silver", "gold", "black", "pinck"] },
 ];
 
+// Updated menu items sorted by : propsMenuItem[] = [
+// Primary navigation - most frequently used
 const menuItems: propsMenuItem[] = [
   {
-    name: "Personal Data",
-    icon: FaUser,
-    url: "/dashboard/PersonalData",
-  },
-  {
-    name: "User",
-    icon: FaUser,
-    url: "/dashboard/user",
-  },
-  {
-    name: "Category",
-    icon: BiCategoryAlt,
-    url: "/dashboard/category",
-  },
-  {
-    name: "FAQ",
-    icon: FaQuestionCircle,
-    url: "/dashboard/faq",
-  },
-  {
-    name: "Add Item",
-    icon: MdAddCircleOutline,
-    url: "/dashboard/AddItem",
+    name: "Home",
+    icon: FaHome,
+    url: "/dashboard/home",
   },
   {
     name: "Products",
-    icon: MdShoppingBasket,
+    icon: FaShoppingBag,
     url: "/dashboard/Products",
-  },
-  {
-    name: "Popular Products",
-    icon: FaShoppingCart,
-    url: "/dashboard/popular",
   },
   {
     name: "User Orders",
@@ -321,30 +304,75 @@ const menuItems: propsMenuItem[] = [
     url: "/dashboard/UserOrder",
   },
   {
-    name: "Blog",
-    icon: FaUser,
-    url: "/dashboard/Blog",
+    name: "Popular Products",
+    icon: FaShoppingCart,
+    url: "/dashboard/popular",
+  },
+  {
+    name: "Add Item",
+    icon: MdAddCircle,
+    url: "/dashboard/AddItem",
+  },
+  {
+    name: "Category",
+    icon: MdCategory,
+    url: "/dashboard/category",
   },
 
+  // Administrative section
+  {
+    name: "User",
+    icon: FaUser,
+    url: "/dashboard/user",
+  },
+  {
+    name: "Personal Data",
+    icon: FaUsers,
+    url: "/dashboard/PersonalData",
+  },
+  {
+    name: "Accounting",
+    icon: MdAccountBalance,
+    url: "/dashboard/Accounting",
+  },
+  {
+    name: "Discounts",
+    icon: FaPercent,
+    url: "/dashboard/discount",
+  },
+  {
+    name: "Manufacturer",
+    icon: BiSolidFactory,
+    url: "/dashboard/manufactori",
+  },
+
+  // Content management
+  {
+    name: "Blog",
+    icon: FaNewspaper,
+    url: "/dashboard/Blog",
+  },
+  {
+    name: "FAQ",
+    icon: FaQuestionCircle,
+    url: "/dashboard/faq",
+  },
+  {
+    name: "About Us",
+    icon: FaInfoCircle,
+    url: "/dashboard/aboutUs",
+  },
   {
     name: "Contact Us",
     icon: FaEnvelope,
     url: "/dashboard/ContactUs",
   },
+
+  // Always at the bottom
   {
-    name: "Discounts",
-    icon: FaGift,
-    url: "/dashboard/discount",
-  },
-  {
-    name: "About Us",
-    icon: FaUsersLine,
-    url: "/dashboard/aboutUs",
-  },
-  {
-    name: "Home",
-    icon: FaHome,
-    url: "/dashboard",
+    name: "Sign Out",
+    icon: FaSignOutAlt,
+    url: "/home",
   },
 ];
 

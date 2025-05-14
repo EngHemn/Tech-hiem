@@ -86,6 +86,10 @@ export const getAllProducts = async (): Promise<ProductFormInput[]> => {
         bigimageUrl: data.bigimageUrl ?? "",
         numSearch: data.numSearch ?? 0,
         smallimageUrl: data.smallimageUrl ?? [],
+        iniPrice: data.iniPrice ?? 0,
+        isev: data.isev,
+        isProduction: data.isProduction,
+        stock: data.stock,
       };
     });
 

@@ -200,6 +200,7 @@ export const setOrder = async (order: OrderType): Promise<string> => {
       totaldiscountPrice: order.totaldiscountPrice || 0,
       userId: order.userId || "",
       note: order.note || "",
+      view: order.view,
     });
 
     update.map(async (item) => {

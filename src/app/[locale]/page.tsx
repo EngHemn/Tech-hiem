@@ -62,7 +62,6 @@ export default function Home() {
   return (
     <div className="flex flex-col justify-center w-full overflow-hidden items-center gap-12">
       {/* <PushNotificationManager /> */}
-      <HomePage />
       <SearchComponent />
       <Hero /> <Catagory />
       <Sales />
