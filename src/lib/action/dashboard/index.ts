@@ -201,10 +201,12 @@ export const getProductsBYDiscountAndCategoryAndSale = async ({
 
   const snapshot = await getDocs(q);
 
-  return snapshot.docs.map((doc) => ({
-    ...(doc.data() as ProductFormInput), // Spread item data
-    id: doc.id, // Add the `id` field
-  }));
+  return snapshot.docs
+    .map((doc) => ({
+      ...(doc.data() as ProductFormInput), // Spread item data
+      id: doc.id, // Add the `id` field
+    }))
+    .filter((item) => item.stock > 0 && item.discount > 0); // Filter out items with stock <= 0
 };
 
 export const deleteBlog = async (id: string) => {

@@ -133,7 +133,12 @@
     "last4DiscountProducts": " بەرهەمی داشکاندن",
     "last7NumberSaleProducts": " بەرهەمی فرۆشتن",
     "last7NewProducts": " بەرهەمی نوێ",
-      "message": "هیچ بەرهەمێک نیە"
+      "message": "هیچ بەرهەمێک نیە",
+      "loading": "بەرهەمەکان لە بارکراوە...",
+      "noProducts": {
+        "title": "هیچ بەرهەمێک نەدۆزرایەوە",
+        "description": "هیچ بەرهەمێک نەمان دۆزینەوە کە پێویستیەکانت پڕ بکات."
+      }
   },
   "products":{
   "home": "ماڵەوە",

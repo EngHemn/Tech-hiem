@@ -37,7 +37,7 @@ const Footer = () => {
           <FooterItem lang={lang} />
           <div className="flex flex-col w-fit items-center gap-4">
             <h2 className="font-semibold text-[16px]">{t("sign_up")}</h2>
-            <SignUpButton>
+            <div>
               <fieldset className="relative border group w-full focus-within:border-blue-700 border-gray-300 px-2 rounded-lg">
                 <legend
                   className="text-blue-700 absolute bg-primary-800  -top-3 left-2 text-sm hidden group-focus-within:block
@@ -58,7 +58,7 @@ const Footer = () => {
                   />
                 </div>
               </fieldset>
-            </SignUpButton>
+            </div>
             <div className="flex w-full justify-between items-center">
               <FaFacebookSquare className="w-[24px] h-[24px] hover:text-blue-800 text-white" />
               <LuTwitter className="w-[24px] h-[24px] hover:text-blue-400 text-white" />

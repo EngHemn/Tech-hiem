@@ -136,7 +136,12 @@
     "last4DiscountProducts": " discount products",
     "last7NumberSaleProducts": "number sale products",
     "message": "Have not product",
-    "last7NewProducts": "new products"
+    "last7NewProducts": "new products",
+     "loading": "Loading products...",
+     "noProducts": {
+      "title": "No Products Found",
+      "description": "We couldn't find any products matching your criteria."
+    }
   }
 , "products":{
   "home": "Home",

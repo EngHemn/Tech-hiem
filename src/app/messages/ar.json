@@ -131,7 +131,12 @@
     "last" : "آخر",
     "last4DiscountProducts": " منتجات خصم",
     "last7NumberSaleProducts": " منتجات مباعة",
-    "last7NewProducts": "منتجات جديدة",  "message": "لا توجد منتجات"
+    "last7NewProducts": "منتجات جديدة",  "message": "لا توجد منتجات",
+   "loading": "جاري تحميل المنتجات...",
+   "noProducts": {
+    "title": "لم يتم العثور على أي منتجات",
+    "description": "لم نتمكن من العثور على أي منتجات تطابق معاييرك."
+  }
   },"products":{
   "home": "الرئيسية",
   "products": "المنتجات",

@@ -132,7 +132,12 @@
     "last4DiscountProducts": " indirim ürünü",
     "last7NumberSaleProducts": " satış ürünü",
     "last7NewProducts": "yeni ürün",
-        "message": "Ürün yok"
+        "message": "Ürün yok",
+        "loading": "Ürünler yükleniyor...",
+"noProducts": {
+    "title": "Ürün bulunamadı",
+    "description": "Kriterlerinize uygun ürün bulunamadı."
+  }
 
   }
   , "products":{

@@ -1,10 +1,11 @@
 "use client";
 import { motion } from "framer-motion";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getFireBase } from "@/lib/action/uploadimage";
 import { catagoryProps } from "@/lib/action";
 import { Skeleton } from "../ui/skeleton";
 import useFilterProducts from "@/lib/store/filterProducts";
+import gsap from "gsap";
 
 const CatagoryProducts = ({}: {}) => {
   const { setCategory, category: selected, resetAll } = useFilterProducts();
@@ -32,9 +33,7 @@ const CatagoryProducts = ({}: {}) => {
     return (
       <div className="flex w-full justify-center gap-4">
         {" "}
-        <Skeleton className="h-[50px] bg-neutral-500 w-[100px]" />
-        <Skeleton className="h-[50px] bg-neutral-500 w-[100px]" />
-        <Skeleton className="h-[50px] bg-neutral-500 w-[100px]" />
+        <CategorySkeleton />
       </div>
     );
   return (
@@ -76,4 +75,72 @@ const CatagoryProducts = ({}: {}) => {
 /> */
 }
 
+const CategorySkeleton = () => {
+  const skeletonRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!skeletonRef.current) return;
+
+    const ctx = gsap.context(() => {
+      // Entrance animation
+      gsap.fromTo(
+        ".skeleton-item",
+        {
+          opacity: 0,
+          scale: 0.8,
+          rotateY: -20,
+        },
+        {
+          opacity: 1,
+          scale: 1,
+          rotateY: 0,
+          duration: 0.6,
+          ease: "back.out(1.7)",
+          stagger: 0.1,
+        }
+      );
+
+      // Continuous shimmer animation
+      gsap.to(".skeleton-shimmer", {
+        x: "200%",
+        duration: 1.5,
+        repeat: -1,
+        ease: "power2.inOut",
+      });
+
+      // Breathing animation
+      gsap.to(".skeleton-item", {
+        scale: 1.02,
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: "power2.inOut",
+        stagger: 0.2,
+      });
+    }, skeletonRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <div ref={skeletonRef} className="flex w-full justify-center gap-4 px-4">
+      {Array.from({ length: 4 }, (_, i) => (
+        <div
+          key={i}
+          className="skeleton-item relative h-[60px] w-[120px] bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 dark:from-slate-700 dark:via-slate-600 dark:to-slate-500 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-600 overflow-hidden"
+        >
+          <div className="absolute inset-2 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-600 dark:to-slate-500 rounded-xl" />
+          <div className="skeleton-shimmer absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full" />
+
+          {/* Decorative elements */}
+          <div className="absolute top-2 right-2 w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+          <div
+            className="absolute bottom-2 left-2 w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"
+            style={{ animationDelay: "0.3s" }}
+          />
+        </div>
+      ))}
+    </div>
+  );
+};
 export default CatagoryProducts;
