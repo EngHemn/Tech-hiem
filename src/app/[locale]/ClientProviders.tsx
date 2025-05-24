@@ -16,7 +16,7 @@ import { arSA, enUS, trTR } from "@clerk/localizations";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import PWAInstallToast from "@/components/home/PWAInstallToast ";
 export const queryClient = new QueryClient();
-
+//
 export default function ClientProviders({
   children,
 }: {
