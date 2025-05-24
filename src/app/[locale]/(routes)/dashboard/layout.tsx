@@ -52,12 +52,23 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useQuery } from "@tanstack/react-query";
+import { getnotification_admin } from "@/lib/action/dashboard";
+import NotificationDropdown from "@/components/Notifaction";
+import SearchComponent from "@/components/home/Search";
 
 const Layout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+  const { data, isLoading } = useQuery({
+    queryKey: ["notifications_admin"],
+    queryFn: async () => {
+      return await getnotification_admin();
+    },
+  });
+
   const pathname = usePathname();
   const { user } = useUser();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -402,9 +413,9 @@ const Layout = ({
           </h1>
 
           {/* Right Section - Search, Notifications, User */}
-          <div className="flex items-center gap-4">
+          <div className="flex w-full  items-center gap-4">
             {/* Search */}
-            <div className="relative hidden lg:block">
+            {/* <div className="relative hidden lg:block">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search..."
@@ -412,69 +423,10 @@ const Layout = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-            </div>
-
+            </div> */}
+            <SearchComponent />
             {/* Notifications */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="rounded-full relative"
-                >
-                  <Bell size={18} />
-                  {unreadCount > 0 && (
-                    <Badge
-                      variant="destructive"
-                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0"
-                    >
-                      {unreadCount}
-                    </Badge>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80 bg-white">
-                <DropdownMenuLabel className="flex justify-between items-center">
-                  <span>Notifications</span>
-                  {unreadCount > 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={markAllNotificationsAsRead}
-                      className="text-xs h-7"
-                    >
-                      Mark all as read
-                    </Button>
-                  )}
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {notifications.length === 0 ? (
-                  <div className="py-4 text-center text-muted-foreground">
-                    No notifications
-                  </div>
-                ) : (
-                  notifications.map((notification) => (
-                    <DropdownMenuItem key={notification.id} className="p-0">
-                      <div
-                        className={`w-full p-3 ${notification.read ? "" : "bg-muted"}`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            <Bell size={14} className="text-primary" />
-                          </div>
-                          <div>
-                            <p className="text-sm">{notification.message}</p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Just now
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </DropdownMenuItem>
-                  ))
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <NotificationDropdown />
 
             {/* User dropdown */}
             {user && (

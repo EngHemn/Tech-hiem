@@ -72,7 +72,7 @@ const Page = () => {
               disabledBtn={data.idBlogSave.includes(item.id)}
               blog={item}
               onSave={() => {
-                addFavoriteBlog({ item });
+                addFavoriteBlog({ userName: user?.fullName, item });
                 queryClient.setQueryData(["saveBlog"], (old: any) => {
                   return {};
                 });
@@ -82,6 +82,7 @@ const Page = () => {
               onUnsave={() => {
                 deleteSave({
                   id: item.id,
+                  userName: user?.fullName,
                   numberOffavorites: item.numberOffavorites,
                   userId: user?.id,
                 });

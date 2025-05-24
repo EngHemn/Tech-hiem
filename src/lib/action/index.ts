@@ -108,6 +108,21 @@ interface propsMenuItem {
   url?: string;
 }
 
+type NotificationType = "order" | "favorite" | "saved_blog";
+type NotificationAction = "added" | "removed";
+
+interface NotificationData {
+  type: NotificationType;
+  action: NotificationAction;
+  userId: string;
+  userName: string;
+  productId?: string;
+  blogId?: string;
+  id?: string;
+  message: string;
+  creatorId?: Date;
+  read: boolean;
+}
 interface ProductFormInput {
   id?: string;
   name: string; // Required product name
@@ -235,6 +250,7 @@ export type {
   Cart,
   BlogColProps,
   // CommentProps,
+  NotificationData,
   SearchTeamProps,
   Category,
   FilterProps,

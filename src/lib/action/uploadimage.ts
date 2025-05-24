@@ -141,11 +141,12 @@ export const getproductByCategory = async (
 
   return products;
 };
-
 export const setUser = async (user: UserType) => {
-  // Sanitize the user data for Firestore
+  if (!user?.id) return;
+
+  // Sanitize user data
   const sanitizedUser = {
-    id: user?.id,
+    id: user.id,
     firstName: user.firstName || "",
     lastName: user.lastName || "",
     fullName: user.fullName || "",
@@ -155,9 +156,28 @@ export const setUser = async (user: UserType) => {
     primaryEmailAddressId: user.primaryEmailAddressId || "",
   };
 
-  await setDoc(doc(db, "user", user?.id), sanitizedUser).catch((error) =>
-    console.error("Error saving user", error)
-  );
+  try {
+    const userRef = doc(db, "user", user.id);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      // Create user document
+      await setDoc(userRef, sanitizedUser);
+
+      // Send admin notification
+      await addDoc(collection(db, "notifications_admin"), {
+        type: "order",
+        action: "added",
+        userId: user.id,
+        userName: user.fullName,
+        createdAt: new Date(),
+        read: false,
+        message: `New user registered: ${user.fullName}`,
+      });
+    }
+  } catch (error) {
+    console.error("Error saving user or notification:", error);
+  }
 };
 
 export const setOrder = async (order: OrderType): Promise<string> => {
@@ -210,7 +230,18 @@ export const setOrder = async (order: OrderType): Promise<string> => {
         numberSale: item.quantitiy + currentNumberSale,
       }).then((res) => {});
     });
-
+    // Send notification to admin about new order
+    await addDoc(collection(db, "notifications_admin"), {
+      type: "order",
+      action: "added",
+      orderId: refSendData.id,
+      userId: order.userId,
+      userName: order.fullName,
+      createdAt: new Date(),
+      read: false,
+      timestamp: new Date(),
+      message: `New order received from ${order.fullName} for $${order.totalAmount}`,
+    });
     return refSendData.id;
   } catch (error) {
     console.error("Error saving order:", error);

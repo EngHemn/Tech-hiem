@@ -13,9 +13,11 @@ import { app, db } from "@/config/firebaseConfig";
 export const addfavorite = async ({
   id,
   item,
+  userName,
 }: {
   id: string;
   item: favorite;
+  userName: string;
 }) => {
   try {
     // Reference to the user's `items` subcollection
@@ -43,6 +45,16 @@ export const addfavorite = async ({
         numberFavorite: nmf,
       });
     }
+    await setDoc(doc(db, "notifications_admin", item.id), {
+      type: "favorite",
+      action: "added",
+      userId: id,
+      message: `${userName} added ${item.name} to favorites`,
+      userName: userName,
+      productId: item.id,
+      timestamp: new Date(),
+      read: false,
+    });
   } catch (error) {
     console.error("Error adding favorite item:", error);
   }
@@ -71,7 +83,8 @@ export const getfavorite = async (userId): Promise<favorite[]> => {
 export const deleteFavorite = async (
   userId: string,
   numberFavorite: number,
-  id: string
+  id: string,
+  userName: string
 ) => {
   try {
     await deleteDoc(doc(db, "favorite", userId, "items", id)).then((res) => {});
@@ -79,6 +92,16 @@ export const deleteFavorite = async (
     await updateDoc(doc(db, "Products", id), {
       numberFavorite: nmf,
     }).then((res) => {});
+    await setDoc(doc(db, "notifications_admin", id), {
+      type: "favorite",
+      action: "removed",
+      userId: userId,
+      userName: userName, // Note: You might want to pass the actual userName as a parameter
+      productId: id,
+      message: `${userName} removed ${id} from favorites`,
+      timestamp: new Date(),
+      read: false,
+    });
   } catch (error) {
     console.error("Error deleting favorite item:", error);
   }
@@ -96,7 +119,13 @@ export const getAllItemNames = async (userId: string): Promise<string[]> => {
   }
 };
 
-export const addFavoriteBlog = async ({ item }: { item: blogFavriteProps }) => {
+export const addFavoriteBlog = async ({
+  item,
+  userName,
+}: {
+  item: blogFavriteProps;
+  userName: string;
+}) => {
   try {
     const itemsRef = collection(db, "saveBlog", item.userId, "items");
 
@@ -112,6 +141,16 @@ export const addFavoriteBlog = async ({ item }: { item: blogFavriteProps }) => {
     await setDoc(doc(db, "saveBlog", item.userId, "items", item.id), {
       ...item,
       numberOffavorites: updatedFavorites,
+    });
+    await setDoc(doc(db, "notifications_admin", item.blogId), {
+      type: "saved_blog",
+      action: "added",
+      userId: item.userId,
+      userName,
+      message: `${userName} added ${item.title} to saved blogs`,
+      blogId: item.blogId,
+      timestamp: new Date(),
+      read: false,
     });
   } catch (error) {
     console.error("Error in addFavoriteBlog function:", error);
@@ -132,10 +171,12 @@ export const deleteSave = async ({
   id,
   numberOffavorites,
   userId,
+  userName,
 }: {
   userId: string;
   numberOffavorites: number;
   id: string;
+  userName: string;
 }) => {
   try {
     await deleteDoc(doc(db, "saveBlog", userId, "items", id)).then((res) => {});
@@ -143,6 +184,16 @@ export const deleteSave = async ({
     await updateDoc(doc(db, "blos", id), {
       numberOffavorites: nmf,
     }).then((res) => {});
+    await setDoc(doc(db, "notifications_admin", id), {
+      type: "saved_blog",
+      action: "removed",
+      userId: userId,
+      userName, // Note: You might want to pass the actual blog title as userName
+      blogId: id,
+      message: `${userName} removed ${id} from saved blogs`,
+      timestamp: new Date(),
+      read: false,
+    });
   } catch (error) {
     console.error("Error deleting favorite item:", error);
   }

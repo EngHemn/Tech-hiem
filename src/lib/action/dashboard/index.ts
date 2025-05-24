@@ -7,11 +7,13 @@ import {
   getDocs,
   orderBy,
   query,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import {
   BlogProps,
   favorite,
+  NotificationData,
   OrderType,
   ProductFormInput,
   teamProps,
@@ -213,4 +215,37 @@ export const deleteBlog = async (id: string) => {
   try {
     await deleteDoc(doc(db, "blogs", id)).then(() => {});
   } catch (error) {}
+};
+
+export const getnotification_admin = async () => {
+  const data = await query(
+    collection(db, "notifications_admin"),
+    where("read", "==", false)
+  );
+  const querySnapshot = await getDocs(data);
+  const result: NotificationData[] = [];
+  querySnapshot.forEach((item) => {
+    result.push({ ...(item.data() as any), id: item.id });
+  });
+  return result as NotificationData[];
+};
+
+export const markNotificationAsRead = async (id: string) => {
+  try {
+    await updateDoc(doc(db, "notifications_admin", id), {
+      read: true,
+    });
+  } catch (error) {
+    console.error("Error marking notification as read:", error);
+  }
+};
+export const markAllNotificationsAsRead = async () => {
+  try {
+    const notificationsRef = doc(db, "notifications_admin");
+    await updateDoc(notificationsRef, {
+      read: true,
+    });
+  } catch (error) {
+    console.error("Error marking all notifications as read:", error);
+  }
 };

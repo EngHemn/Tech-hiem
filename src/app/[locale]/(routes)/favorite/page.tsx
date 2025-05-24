@@ -95,6 +95,7 @@ const Page = () => {
                 // click={() => setstate((pre) => pre + 1)}
                 item={itemorder}
                 userId={user?.id}
+                userName={user?.fullName}
                 addFavoriteid={() => {
                   // setproducts((pre) =>
                   //   pre.map((item) =>

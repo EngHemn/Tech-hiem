@@ -340,11 +340,6 @@ const menuItems: propsMenuItem[] = [
     icon: FaPercent,
     url: "/dashboard/discount",
   },
-  {
-    name: "Manufacturer",
-    icon: BiSolidFactory,
-    url: "/dashboard/manufactori",
-  },
 
   // Content management
   {

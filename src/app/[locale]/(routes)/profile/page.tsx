@@ -169,7 +169,11 @@ export default function ProfilePage() {
               ) : data?.favorites?.length > 0 ? (
                 <div className="space-y-3">
                   {data.favorites.slice(0, 3).map((item, index) => (
-                    <CardFavorite key={index} item={item} />
+                    <CardFavorite
+                      userName={user.fullName}
+                      key={index}
+                      item={item}
+                    />
                   ))}
                 </div>
               ) : (

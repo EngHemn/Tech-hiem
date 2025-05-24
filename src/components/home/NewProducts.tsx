@@ -78,7 +78,13 @@ const NewProducts = ({
               className="transition-transform duration-200 hover:scale-110"
               onClick={(e) => {
                 handleFavoriteClick(e);
-                deleteFavorite(user?.id, product.numberFavorite, product.id);
+                deleteFavorite(
+                  user?.id,
+                  product.numberFavorite,
+
+                  product.id,
+                  user.fullName
+                );
                 deleteFavoriteId && deleteFavoriteId();
               }}
             />
@@ -91,6 +97,7 @@ const NewProducts = ({
                 handleFavoriteClick(e);
                 addfavorite({
                   id: user.id,
+                  userName: user?.fullName,
                   item: {
                     name: product.name,
                     categroy: product.category,

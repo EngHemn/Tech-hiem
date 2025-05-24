@@ -11,12 +11,14 @@ const CardFavorite = ({
   deleteFavoriteId,
   favoriteId,
   addFavoriteid,
+  userName,
 }: {
   click?: () => void;
   userId?: string;
   item: favorite;
   deleteFavoriteId?: () => void;
   addFavoriteid?: () => void;
+  userName: string;
   favoriteId?: string[];
 }) => {
   const handleFavoriteClick = (e: React.MouseEvent) => {
@@ -37,9 +39,12 @@ const CardFavorite = ({
               onClick={(e) => {
                 handleFavoriteClick(e);
                 deleteFavoriteId();
-                deleteFavorite(userId, item.numberFavorite, item.id).finally(
-                  () => {}
-                );
+                deleteFavorite(
+                  userId,
+                  item.numberFavorite,
+                  userName,
+                  item.id
+                ).finally(() => {});
               }}
               className="absolute p-3 box-content sm:size-[25px] size-[23px]  top-2 z-50 right-2 cursor-pointer"
             />
@@ -50,6 +55,7 @@ const CardFavorite = ({
                 handleFavoriteClick(e);
                 addfavorite({
                   id: userId,
+                  userName,
                   item: {
                     name: item.name,
                     categroy: item.categroy,

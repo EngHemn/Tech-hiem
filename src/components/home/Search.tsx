@@ -39,7 +39,7 @@ import { FaBlog } from "react-icons/fa";
 import { RiFileSearchLine } from "react-icons/ri";
 import { FaUserFriends } from "react-icons/fa";
 
-const SearchComponent = () => {
+const SearchComponent = ({ type }: { type?: "dashboard" }) => {
   const [searchValue, setSearchValue] = useState("");
   const [filteredData, setFilteredData] = useState<searchProps[]>([]);
   const [searchBlog, setSearchBlog] = useState<SearchBlogsProps[]>([]);
@@ -135,20 +135,20 @@ const SearchComponent = () => {
         // Run searches in parallel for better performance
         const promises = [];
 
-        if (search_by.search.includes("product")) {
+        if (search_by.search.includes("product") || type === "dashboard") {
           promises.push(
             Search(value).then((data) => (results.products = data))
           );
         }
-        if (search_by.search.includes("blog")) {
+        if (search_by.search.includes("blog") || type === "dashboard") {
           promises.push(fns(value).then((data) => (results.blogs = data)));
         }
-        if (search_by.search.includes("category")) {
+        if (search_by.search.includes("category") || type === "dashboard") {
           promises.push(
             SearchCategory(value).then((data) => (results.categories = data))
           );
         }
-        if (search_by.search.includes("team_member")) {
+        if (search_by.search.includes("team_member") || type === "dashboard") {
           promises.push(
             search_Team(value).then((data) => (results.team = data))
           );
@@ -207,12 +207,22 @@ const SearchComponent = () => {
     setSearchTeam([]);
   };
 
-  // Count total results
+  // Helper function to check if search type should be shown
+  const shouldShowSearchType = (searchType: string) => {
+    return type === "dashboard" || search_by.search.includes(searchType);
+  };
+
+  // Count total results - show all for dashboard
   const totalResults =
-    (search_by.search.includes("product") ? filteredData.length : 0) +
-    (search_by.search.includes("blog") ? searchBlog.length : 0) +
-    (search_by.search.includes("category") ? searchCategory.length : 0) +
-    (search_by.search.includes("team_member") ? searchTeam.length : 0);
+    type === "dashboard"
+      ? filteredData.length +
+        searchBlog.length +
+        searchCategory.length +
+        searchTeam.length
+      : (search_by.search.includes("product") ? filteredData.length : 0) +
+        (search_by.search.includes("blog") ? searchBlog.length : 0) +
+        (search_by.search.includes("category") ? searchCategory.length : 0) +
+        (search_by.search.includes("team_member") ? searchTeam.length : 0);
 
   const renderSearchItem = (
     item: any,
@@ -324,7 +334,7 @@ const SearchComponent = () => {
                         {t("All")}
                       </TabsTrigger>
 
-                      {search_by.search.includes("category") && (
+                      {shouldShowSearchType("category") && (
                         <TabsTrigger
                           value="category"
                           className="data-[state=active]:bg-secondary/10 data-[state=active]:text-secondary"
@@ -334,7 +344,7 @@ const SearchComponent = () => {
                         </TabsTrigger>
                       )}
 
-                      {search_by.search.includes("product") && (
+                      {shouldShowSearchType("product") && (
                         <TabsTrigger
                           value="product"
                           className="data-[state=active]:bg-secondary/10 data-[state=active]:text-secondary"
@@ -344,7 +354,7 @@ const SearchComponent = () => {
                         </TabsTrigger>
                       )}
 
-                      {search_by.search.includes("team_member") && (
+                      {shouldShowSearchType("team_member") && (
                         <TabsTrigger
                           value="team"
                           className="data-[state=active]:bg-secondary/10 data-[state=active]:text-secondary"
@@ -354,7 +364,7 @@ const SearchComponent = () => {
                         </TabsTrigger>
                       )}
 
-                      {search_by.search.includes("blog") && (
+                      {shouldShowSearchType("blog") && (
                         <TabsTrigger
                           value="blog"
                           className="data-[state=active]:bg-secondary/10 data-[state=active]:text-secondary"
@@ -369,7 +379,7 @@ const SearchComponent = () => {
                   <CardContent className="pt-4">
                     <TabsContent value="all" className="m-0">
                       <ScrollArea className="h-[400px] pr-4">
-                        {search_by.search.includes("category") &&
+                        {shouldShowSearchType("category") &&
                           searchCategory.length > 0 && (
                             <div className="mb-4">
                               <div className="flex items-center gap-2 mb-2 bg-secondary/5 p-2 rounded-md">
@@ -399,7 +409,7 @@ const SearchComponent = () => {
                             </div>
                           )}
 
-                        {search_by.search.includes("product") &&
+                        {shouldShowSearchType("product") &&
                           filteredData.length > 0 && (
                             <div className="mb-4">
                               <div className="flex items-center gap-2 mb-2 bg-secondary/5 p-2 rounded-md">
@@ -429,7 +439,7 @@ const SearchComponent = () => {
                             </div>
                           )}
 
-                        {search_by.search.includes("team_member") &&
+                        {shouldShowSearchType("team_member") &&
                           searchTeam.length > 0 && (
                             <div className="mb-4">
                               <div className="flex items-center gap-2 mb-2 bg-secondary/5 p-2 rounded-md">
@@ -459,7 +469,7 @@ const SearchComponent = () => {
                             </div>
                           )}
 
-                        {search_by.search.includes("blog") &&
+                        {shouldShowSearchType("blog") &&
                           searchBlog.length > 0 && (
                             <div className="mb-4">
                               <div className="flex items-center gap-2 mb-2 bg-secondary/5 p-2 rounded-md">
@@ -587,7 +597,7 @@ const SearchComponent = () => {
                   </CardContent>
                 </Tabs>
               </Card>
-            ) : !search_by.search.length ? (
+            ) : !search_by.search.length && type !== "dashboard" ? (
               <p className="px-4 py-6 w-full text-center text-neutral-500 dark:text-neutral-400">
                 {t("allowSearch")}
               </p>

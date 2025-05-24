@@ -140,6 +140,7 @@ const Page = ({ params }) => {
                 onClick={async () => {
                   try {
                     await addFavoriteBlog({
+                      userName: user?.fullName,
                       item: {
                         blogId: id,
                         description: data.blog.description,
@@ -176,6 +177,8 @@ const Page = ({ params }) => {
                   try {
                     await deleteSave({
                       id,
+                      userName: user?.fullName,
+
                       numberOffavorites: data.blog.numberOffavorites,
                       userId: user?.id,
                     });
