@@ -191,12 +191,13 @@ const Mune = ({ category }: { category: catagoryProps[] }) => {
     }
   };
   const changelanguage = (lang: string) => {
-    // Get the current URL
-    const currentPath = window.location.pathname; // Use the browser's `pathname`
-    const newPath = currentPath.replace(/^\/[a-z]{2}/, `/${lang}`); // Replace the language prefix
-
-    // Push the new path
-    r.push(newPath);
+    // Set locale in cookie
+    const expires = new Date();
+    expires.setFullYear(expires.getFullYear() + 1);
+    document.cookie = `NEXT_LOCALE=${lang}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+    
+    // Reload the page to apply the new locale
+    window.location.reload();
   };
   const isActive = router;
   return (

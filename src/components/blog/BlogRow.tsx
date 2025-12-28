@@ -3,6 +3,7 @@ import { lang } from "@/lib/action/uploadimage";
 import Image from "next/image";
 import React from "react";
 import { MdOutlineDateRange } from "react-icons/md";
+import { LuTimer } from "react-icons/lu";
 
 const BlogRow = ({
   item,
@@ -14,62 +15,77 @@ const BlogRow = ({
   const l = lang().startsWith("ar") || lang().startsWith("ku");
   return (
     <div
-      className={`w-full text-left h-[146px] flex-row-reverse flex items-center border overflow-hidden rounded-xl group dark:shadow-neutral-700 shadow-gray-200 shadow-md md:shadow-lg justify-start gap-0
-        `}
+      className={`w-full text-left h-[160px] md:h-[180px] flex-row-reverse flex items-center 
+                  border border-gray-200 dark:border-gray-700 overflow-hidden rounded-2xl group 
+                  bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-all duration-300 
+                  transform hover:-translate-y-1 justify-start gap-0`}
     >
-      {/* Dynamic Image */}
-      <Image
-        src={item.image} // Dynamic image URL
-        alt={item.title} // Dynamic alt text
-        width={240}
-        height={156}
-        className={`min-w-[130px] max-w-[130px] min-h-[160px] max-h-[160px] bg-blue-100 border-dashed`}
-      />
+      {/* Image Container */}
+      <div className="relative min-w-[140px] md:min-w-[180px] max-w-[140px] md:max-w-[180px] 
+                      h-full overflow-hidden">
+        <Image
+          src={item.image}
+          alt={item.title}
+          width={240}
+          height={156}
+          className="w-full h-full object-cover transition-transform duration-500 
+                     group-hover:scale-110"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent 
+                        to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      </div>
 
       {/* Content Section */}
-      <div className="flex flex-col w-full sm:px-4 px-2 py-2 h-full justify-between">
-        {/* Dynamic Title */}
+      <div className="flex flex-col w-full px-4 md:px-6 py-4 h-full justify-between">
+        {/* Title */}
         <h3
-          className={`lg:text-[16px] text-10 md:text-13 font-semibold sm:group-hover:text-red-500 duration-300`}
+          className={`lg:text-lg md:text-base text-sm font-bold text-gray-900 dark:text-gray-100 
+                      line-clamp-2 group-hover:text-red-500 dark:group-hover:text-red-400 
+                      transition-colors duration-300 leading-tight`}
         >
           {item.title}
         </h3>
 
-        {/* Dynamic Description */}
+        {/* Description */}
         <p
-          className={`min-h-[35px] max-h-[35px] md:text-10 text-8 dark:text-neutral-500 lg:text-[10px] xl:text-12 overflow-hidden mt-2 text-neutral-800`}
+          className={`min-h-[40px] max-h-[50px] md:min-h-[45px] md:max-h-[55px] 
+                      text-xs md:text-sm dark:text-gray-400 overflow-hidden mt-2 
+                      text-gray-600 line-clamp-2 leading-relaxed`}
         >
-          {item.description} Lorem ipsum dolor sit amet, consectetur adipisicing
-          elit. Aspernatur repellendus voluptatem autem in, dolor laborum quasi
-          impedit ab sed consequuntur ex dolorem itaque ipsa minus dignissimos
-          alias corporis molestias voluptatibus.
+          {item.description}
         </p>
 
         {/* Metadata Section */}
-        <div className="flex sm:mt-4 justify-between items-center">
-          <p className="flex items-center gap-2">
-            <MdOutlineDateRange
-              color="#717171"
-              className={`${
-                type === "blog_single_page" && "lg:w-[15px] lg:h-[15px]"
-              }`}
-            />
-            <span
-              className={`${
-                type === "blog_single_page" && "lg:text-9 md:text-10"
-              } lg:text-9 md:text-10 text-8 text-neutral-400 hover:text-red-600`}
-            >
-              {new Date(item.date).toLocaleDateString()} {/* Dynamic date */}
-            </span>
-          </p>
+        <div className="flex mt-3 md:mt-4 justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <MdOutlineDateRange
+                className={`text-gray-500 dark:text-gray-400 ${
+                  type === "blog_single_page" && "lg:w-[15px] lg:h-[15px]"
+                } w-4 h-4`}
+              />
+              <span
+                className={`${
+                  type === "blog_single_page" && "lg:text-xs md:text-sm"
+                } text-xs md:text-sm text-gray-500 dark:text-gray-400`}
+              >
+                {new Date(item.date).toLocaleDateString()}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <LuTimer className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
+              <span className="text-xs text-gray-500 dark:text-gray-400">3 min</span>
+            </div>
+          </div>
           <Image
-            src={"/save-2.svg"} // Keep this static if it's always the same icon
+            src={"/save-2.svg"}
             alt="Save icon"
             width={20}
             height={20}
             className={`${
               type === "blog_single_page" && "lg:w-[15px] lg:h-[15px]"
-            } sm:opacity-0 sm:group-hover:opacity-100 max-w-[15px] max-h-[15px] transition-all duration-300`}
+            } opacity-0 group-hover:opacity-100 w-5 h-5 transition-all duration-300 
+            cursor-pointer hover:scale-110`}
           />
         </div>
       </div>

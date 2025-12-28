@@ -163,21 +163,35 @@ interface searchProps {
   category: string;
   numSearch: number;
   id: string;
+  bigimageUrl?: string;
 }
 interface SearchBlogsProps {
   name: string;
   id: string;
   numberOfSearches: number;
+  description: string;
+  image?: string;
+  video?: string;
+  type?: "video" | "image";
 }
 interface SearchCategoryProps {
   name: string;
   id: string;
   numberOfSearches: number;
+  image?: CategoryImage;
 }
 interface SearchTeamProps {
   fullName: string;
   id: string;
   numOfSearch: number;
+  description: string;
+  imageUrl?: string;
+}
+interface SearchUserProps {
+  id: string;
+  name: string;
+  email: string;
+  image?: string;
 }
 interface BlogProps {
   id?: string; // Unique identifier for
@@ -260,9 +274,11 @@ export type {
   ProductInfoProps,
   errorCheckOutProps,
   SearchCategoryProps,
+  SearchUserProps,
   propsMenuItem,
   ProductFormInput,
   catagoryProps,
+  CategoryImage,
 };
 
 export type UserType = {

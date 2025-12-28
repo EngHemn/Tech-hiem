@@ -318,6 +318,11 @@ const menuItems: propsMenuItem[] = [
     icon: MdCategory,
     url: "/dashboard/category",
   },
+  {
+    name: "Bulk Data",
+    icon: MdAddCircle,
+    url: "/dashboard/bulk-data",
+  },
 
   // Administrative section
   {

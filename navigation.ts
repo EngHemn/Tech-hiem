@@ -1,6 +1,4 @@
-import { createSharedPathnamesNavigation } from "next-intl/navigation";
-import { locales } from "./i18n";
-
-export const { Link, redirect, usePathname, useRouter } =
-  createSharedPathnamesNavigation({ locales /* */ });
-//jk
+// Since we're using cookies for locale instead of URL prefixes,
+// we can use regular Next.js navigation
+export { default as Link } from "next/link";
+export { redirect, usePathname, useRouter } from "next/navigation";

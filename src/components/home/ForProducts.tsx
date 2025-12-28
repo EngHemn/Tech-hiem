@@ -1,14 +1,12 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
-import { IoChevronBack } from "react-icons/io5";
-import { MdNavigateNext } from "react-icons/md";
+import { GrFormNextLink } from "react-icons/gr";
+import { IoArrowBackOutline } from "react-icons/io5";
 import NewProducts from "./NewProducts";
-import { newProdcuts } from "@/util/data";
 import { ProductFormInput } from "@/lib/action";
-import { Loader } from "@/app/[locale]/loader";
+import { Loader } from "@/app/loader";
 import { useUser } from "@clerk/nextjs";
 import { getAllItemNames } from "@/lib/action/fovarit";
-import { motion, AnimatePresence } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { Observer } from "gsap/dist/Observer";
@@ -17,10 +15,12 @@ const ForProducts = ({
   products,
   load,
   title,
+  displayAsColumns = false,
 }: {
   load?: boolean;
   products?: ProductFormInput[];
   title?: "dashboard" | "viewAll";
+  displayAsColumns?: boolean;
 }) => {
   const [startProducts, setStartProducts] = useState(0);
   const [pro, setpro] = useState<ProductFormInput[]>(products);
@@ -28,7 +28,8 @@ const ForProducts = ({
   const [favoriteId, setfavoriteId] = useState<string[]>();
   const { user } = useUser();
 
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const productRefs = useRef([]);
 
   // Register GSAP plugins
@@ -51,6 +52,27 @@ const ForProducts = ({
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Scroll functions
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = scrollContainerRef.current.clientWidth * 0.8;
+      scrollContainerRef.current.scrollBy({
+        left: -scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = scrollContainerRef.current.clientWidth * 0.8;
+      scrollContainerRef.current.scrollBy({
+        left: scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
 
   useEffect(() => {
     const getdata = async () => {
@@ -146,7 +168,7 @@ const ForProducts = ({
       return () => ctx.revert();
     }
   }, [load, pro]);
-  ``;
+
   // Reset refs when products change
   useEffect(() => {
     productRefs.current = productRefs.current.slice(0, pro?.length || 0);
@@ -164,22 +186,41 @@ const ForProducts = ({
       </div>
     );
 
+  // Don't show scroll buttons for dashboard or viewAll pages, or when displaying as columns
+  const showScrollButtons = !title && !displayAsColumns;
+
   return (
-    <div
-      ref={containerRef}
-      className="mt-3 w-full md:flex-wrap overflow-hidden sm:flex grid grid-cols-2 bg-blue-10 gap-2 md:gap-6 relative justify-center items-center"
-    >
-      {pro &&
-        pro
-          .slice(
-            !title ? startProducts : 0,
-            !title ? startProducts + limit : products.length
-          )
-          .map((product, index) => (
+    <div ref={containerRef} className="mt-3 w-full relative">
+      {/* Products Container - Row or Column Layout */}
+      <div
+        ref={scrollContainerRef}
+        className={
+          displayAsColumns
+            ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 pb-4"
+            : "flex overflow-x-auto scrollbar-hide gap-2 md:gap-6 pb-4 scroll-smooth"
+        }
+        style={
+          displayAsColumns
+            ? {}
+            : {
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+                WebkitOverflowScrolling: "touch",
+              }
+        }
+      >
+        {pro &&
+          pro.map((product, index) => (
             <div
               key={product.id || index}
               ref={(el): any => (productRefs.current[index] = el)}
-              className={`${index === 4 && "hidden sm:block"} py-2 md:py-6 product-item`}
+              className={
+                displayAsColumns
+                  ? `py-2 md:py-6 product-item`
+                  : `flex-shrink-0 py-2 md:py-6 product-item ${
+                      index === 4 && "hidden sm:block"
+                    }`
+              }
               style={{
                 transformStyle: "preserve-3d",
                 perspective: "1000px",
@@ -198,7 +239,10 @@ const ForProducts = ({
                       return pre.filter((item) =>
                         item.id !== product.id
                           ? item
-                          : { ...item, numberFavorite: item.numberFavorite + 1 }
+                          : {
+                              ...item,
+                              numberFavorite: item.numberFavorite + 1,
+                            }
                       );
                     });
                     setfavoriteId((pre) => [product.id, ...pre]);
@@ -208,7 +252,10 @@ const ForProducts = ({
                       pre.map((item) =>
                         item.id !== product.id
                           ? item
-                          : { ...item, numberFavorite: item.numberFavorite - 1 }
+                          : {
+                              ...item,
+                              numberFavorite: item.numberFavorite - 1,
+                            }
                       )
                     );
                     setfavoriteId((prev) =>
@@ -221,6 +268,36 @@ const ForProducts = ({
               </div>
             </div>
           ))}
+      </div>
+
+      {/* Scroll Navigation Buttons - Only show on home page */}
+      {showScrollButtons && pro && pro.length > 0 && (
+        <>
+          <button
+            onClick={scrollLeft}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-800 shadow-lg rounded-full p-2 transition-all duration-300 hover:scale-110 hidden md:flex items-center justify-center"
+            aria-label="Scroll left"
+          >
+            <IoArrowBackOutline className="text-gray-700 dark:text-gray-300 text-2xl" />
+          </button>
+          <button
+            onClick={scrollRight}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-800 shadow-lg rounded-full p-2 transition-all duration-300 hover:scale-110 hidden md:flex items-center justify-center"
+            aria-label="Scroll right"
+          >
+            <GrFormNextLink className="text-gray-700 dark:text-gray-300 text-2xl" />
+          </button>
+        </>
+      )}
+
+      {/* Hide scrollbar for webkit browsers - only when in row mode */}
+      {!displayAsColumns && (
+        <style jsx>{`
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+      )}
     </div>
   );
 };

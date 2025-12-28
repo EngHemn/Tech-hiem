@@ -5,6 +5,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  limit,
   orderBy,
   query,
   updateDoc,
@@ -167,38 +168,79 @@ export const getOrder = async (userid: string): Promise<OrderType[]> => {
 export const getProductsBYDiscountAndCategoryAndSale = async ({
   col,
   category,
+  limit: limitParam,
 }: {
   col: string;
   category: string;
+  limit?: number;
 }): Promise<ProductFormInput[]> => {
   let q;
   if (col === "date") {
     q =
       category !== ""
-        ? query(
-            collection(db, "Products"),
-            where("category", "==", category), // ✅ Correct placement
-            orderBy(col, "desc")
-          )
-        : query(collection(db, "Products"), orderBy(col, "asc"));
+        ? limitParam
+          ? query(
+              collection(db, "Products"),
+              where("category", "==", category), // ✅ Correct placement
+              orderBy(col, "desc"),
+              limit(limitParam)
+            )
+          : query(
+              collection(db, "Products"),
+              where("category", "==", category), // ✅ Correct placement
+              orderBy(col, "desc")
+            )
+        : limitParam
+          ? query(
+              collection(db, "Products"),
+              orderBy(col, "asc"),
+              limit(limitParam)
+            )
+          : query(collection(db, "Products"), orderBy(col, "asc"));
   } else if (col !== "discount") {
     q =
       category !== ""
-        ? query(
-            collection(db, "Products"),
-            where("category", "==", category), // ✅ Correct placement
-            orderBy(col, "desc")
-          )
-        : query(collection(db, "Products"), orderBy(col, "desc"));
+        ? limitParam
+          ? query(
+              collection(db, "Products"),
+              where("category", "==", category), // ✅ Correct placement
+              orderBy(col, "desc"),
+              limit(limitParam)
+            )
+          : query(
+              collection(db, "Products"),
+              where("category", "==", category), // ✅ Correct placement
+              orderBy(col, "desc")
+            )
+        : limitParam
+          ? query(
+              collection(db, "Products"),
+              orderBy(col, "desc"),
+              limit(limitParam)
+            )
+          : query(collection(db, "Products"), orderBy(col, "desc"));
   } else {
     q =
       category !== ""
-        ? query(
-            collection(db, "Products"),
-            where("category", "==", category), // ✅ Correct placement
-            where("isDiscount", "==", true)
-          )
-        : query(collection(db, "Products"), where("isDiscount", "==", true));
+        ? limitParam
+          ? query(
+              collection(db, "Products"),
+              where("category", "==", category), // ✅ Correct placement
+              where("isDiscount", "==", true),
+              limit(limitParam)
+            )
+          : query(
+              collection(db, "Products"),
+              where("category", "==", category), // ✅ Correct placement
+              where("isDiscount", "==", true)
+            )
+        : limitParam
+          ? query(
+              collection(db, "Products"),
+              where("isDiscount", "==", true),
+              limit(limitParam)
+            )
+          : query(collection(db, "Products"), where("isDiscount", "==", true));
   }
 
   const snapshot = await getDocs(q);

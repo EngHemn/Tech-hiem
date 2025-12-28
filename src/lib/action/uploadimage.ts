@@ -1,5 +1,3 @@
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
 import {
   addDoc,
   arrayUnion,
@@ -18,6 +16,7 @@ import {
 import {
   BlogProps,
   catagoryProps,
+  CategoryImage,
   contactUSProps,
   faqProps,
   ProductFormInput,
@@ -25,33 +24,77 @@ import {
   SearchCategoryProps,
   searchProps,
   SearchTeamProps,
+  SearchUserProps,
   teamProps,
   typeFilter,
   UserType,
   // commentProps,
 } from "@/lib/action";
-import { app, storage } from "@/config/firebaseConfig";
+import { app } from "@/config/firebaseConfig";
 import { OrderType } from "@/lib/action";
 import { number, string } from "zod";
 import { title } from "process";
 
 const db = getFirestore(app);
-// Function to upload the image
+
+// Function to upload the image using Next.js API route
 export async function uploadImage(file: File): Promise<string> {
   try {
-    // Create a storage reference
-    const storageRef = ref(storage, `images/${file.name}`);
+    // Get the current locale from cookies or default to 'en'
+    const locale = lang();
 
-    // Upload the file
-    const snapshot = await uploadBytes(storageRef, file);
+    // Create form data
+    const formData = new FormData();
+    formData.append("file", file);
 
-    // Get the download URL
-    const downloadURL = await getDownloadURL(snapshot.ref);
+    // Fetch options to include credentials (cookies) for Clerk authentication
+    const fetchOptions: RequestInit = {
+      method: "POST",
+      credentials: "include", // Include cookies for Clerk session
+      body: formData,
+    };
 
-    return downloadURL;
-  } catch (error) {
+    // Use API route without locale prefix
+    const response = await fetch("/api/upload-image", fetchOptions);
+
+    if (!response.ok) {
+      let errorMessage = "Failed to upload image";
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+
+        // Provide more specific error messages
+        if (response.status === 401) {
+          errorMessage = "Unauthorized. Please sign in to upload images.";
+        } else if (response.status === 400) {
+          errorMessage =
+            errorData.error || "Invalid file. Please check file type and size.";
+        } else if (response.status === 500) {
+          errorMessage =
+            errorData.error || "Server error. Please try again later.";
+        }
+      } catch (e) {
+        // If response is not JSON, use status text
+        errorMessage = response.statusText || errorMessage;
+      }
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    const { url } = data;
+
+    if (!url) {
+      throw new Error("No URL received from server");
+    }
+
+    // Return the full URL (relative path will work with Next.js)
+    // If you need absolute URL, you can construct it here
+    return url;
+  } catch (error: any) {
     console.error("Error uploading image:", error);
-    throw error;
+    throw new Error(
+      error.message || "Failed to upload image. Please try again."
+    );
   }
 }
 export const getFireBase = async (dbName: string): Promise<catagoryProps[]> => {
@@ -261,21 +304,28 @@ export const Search = async (searchValue: string): Promise<searchProps[]> => {
         id: data.id,
         numSearch: data.numSearch,
         category: data.category,
+        bigimageUrl: data.bigimageUrl,
       });
     }
   });
 
   return results;
 };
-export const SearchBlog = async (searchValue): Promise<SearchBlogsProps[]> => {
+export const SearchBlog = async (
+  searchValue: string
+): Promise<SearchBlogsProps[]> => {
   const data = await getDocs(collection(db, "blogs"));
   const results: SearchBlogsProps[] = [];
-  data.forEach(async (item) => {
+  data.forEach((item) => {
     if (item.data().title.toLowerCase().includes(searchValue.toLowerCase())) {
       results.push({
         id: item.id as string,
         name: item.data().title as string,
         numberOfSearches: item.data().numberOfSearches as number,
+        description: item.data().description as string,
+        image: item.data().image as string,
+        video: item.data().video as string,
+        type: item.data().type as "video" | "image",
       });
     }
   });
@@ -287,12 +337,13 @@ export const SearchCategory = async (
 ): Promise<SearchCategoryProps[]> => {
   const data = await getDocs(collection(db, "category"));
   const results: SearchCategoryProps[] = [];
-  data.forEach(async (item) => {
+  data.forEach((item) => {
     if (item.data().name.toLowerCase().includes(searchValue.toLowerCase())) {
       results.push({
         id: item.id as string,
         name: item.data().name as string,
         numberOfSearches: item.data().numberOfSearches as number,
+        image: item.data().image as CategoryImage,
       });
     }
   });
@@ -305,7 +356,7 @@ export const search_Team = async (
 ): Promise<SearchTeamProps[]> => {
   const data = await getDocs(collection(db, "team"));
   const results: SearchTeamProps[] = [];
-  data.forEach(async (item) => {
+  data.forEach((item) => {
     if (
       item.data().fullName.toLowerCase().includes(searchValue.toLowerCase())
     ) {
@@ -313,6 +364,38 @@ export const search_Team = async (
         id: item.id as string,
         fullName: item.data().fullName as string,
         numOfSearch: item.data().numOfSearch as number,
+        description: item.data().description as string,
+        imageUrl: item.data().imageUrl as string,
+      });
+    }
+  });
+
+  return results;
+};
+
+export const search_User = async (
+  searchValue: string
+): Promise<SearchUserProps[]> => {
+  const data = await getDocs(collection(db, "user"));
+  const results: SearchUserProps[] = [];
+  data.forEach((item) => {
+    const userData = item.data();
+    const fullName =
+      userData.fullName ||
+      `${userData.firstName || ""} ${userData.lastName || ""}`.trim();
+    const email =
+      userData.emailAddresses?.[0]?.emailAddress || userData.email || "";
+
+    if (
+      fullName.toLowerCase().includes(searchValue.toLowerCase()) ||
+      email.toLowerCase().includes(searchValue.toLowerCase()) ||
+      userData.username?.toLowerCase().includes(searchValue.toLowerCase())
+    ) {
+      results.push({
+        id: item.id as string,
+        name: fullName || "Unknown",
+        email: email,
+        image: userData.image || userData.imageUrl,
       });
     }
   });
@@ -520,5 +603,21 @@ export const setComments = async ({
 //       userIdLike === item.userId
 //   );
 // };
-export const lang = () =>
-  typeof window !== "undefined" ? window.location.pathname.split("/")[1] : "fa";
+export const lang = () => {
+  if (typeof window === "undefined") return "en";
+
+  // Get locale from cookies
+  const cookies = document.cookie.split(";");
+  const localeCookie = cookies.find((cookie) =>
+    cookie.trim().startsWith("NEXT_LOCALE=")
+  );
+
+  if (localeCookie) {
+    const locale = localeCookie.split("=")[1]?.trim();
+    if (locale && ["en", "ku", "tr", "ar"].includes(locale)) {
+      return locale;
+    }
+  }
+
+  return "en";
+};

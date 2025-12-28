@@ -8,14 +8,14 @@ import { IoArrowBackOutline } from "react-icons/io5";
 
 import NewProducts from "./NewProducts";
 
-import { Loader } from "@/app/[locale]/loader";
+import { Loader } from "@/app/loader";
 import { getAllItemNames } from "@/lib/action/fovarit";
 import { useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { getProductsBYDiscountAndCategoryAndSale } from "@/lib/action/dashboard";
-import { queryClient } from "@/app/[locale]/ClientProviders";
+import { queryClient } from "@/app/ClientProviders";
 const Sales = () => {
   const { user } = useUser();
   const { data, isLoading, error } = useQuery({
@@ -38,7 +38,7 @@ const Sales = () => {
       whileInView={{ y: 0, opacity: 1 }}
       exit={{ y: -100, opacity: 0.2 }}
       transition={{ duration: 0.6, type: "tween" }}
-      className="flex flex-col lg:max-w-[1200px] sm:flex-row rounded-2xl overflow-hidden dark:bg-primary-700 bg-primary-500 h-full w-full py-3 pb-7  px-3  items-center justify-center shadow-blue-950 shadow-md relative sm:rounded-md text-white gap-4"
+      className="flex flex-col lg:max-w-[1400px] sm:flex-row rounded-2xl overflow-hidden dark:bg-primary-700 bg-primary-500 h-full w-full py-3 pb-7  px-3  items-center justify-center shadow-blue-950 shadow-md relative sm:rounded-md text-white gap-4"
     >
       <Image
         src={"/shape.png"}
@@ -58,18 +58,17 @@ const Sales = () => {
         </button>
       </div>
       {isLoading && (
-        <div className="sm:grid w-full sm:w-[80%] gap-3  items-center flex overflow-x-auto  sm:overflow-hidden sm:grid-cols-4 justify-start">
+        <div className="w-full sm:w-[80%] gap-3 items-center flex flex-wrap overflow-x-auto sm:overflow-hidden sm:grid sm:grid-cols-3 justify-start">
           <Loader />
           <Loader />
           <div className="hidden sm:flex">
-            <Loader />
             <Loader />
           </div>
         </div>
       )}
       {!isLoading && (
-        <div className="sm:grid w-full sm:w-[80%] gap-3  items-center flex overflow-x-auto  sm:overflow-hidden sm:grid-cols-4 justify-start">
-          {data.products.slice(start, 4 + start).map((item) => (
+        <div className="w-full sm:w-[80%] gap-3 items-center flex flex-wrap overflow-x-auto sm:overflow-hidden sm:grid sm:grid-cols-3 justify-start">
+          {data.products.slice(start, 3 + start).map((item) => (
             <NewProducts
               favoriteId={data.favoriteId}
               addFavoriteid={() => {
@@ -124,6 +123,7 @@ const Sales = () => {
               key={item.name}
               itemDb={item}
               title="sale"
+              className="min-w-[300px] max-w-[300px]"
             />
           ))}
         </div>
@@ -137,7 +137,7 @@ const Sales = () => {
         <GrFormNextLink
           color="white"
           onClick={() =>
-            setStart((pre) => (pre >= data.products.length - 4 ? pre : pre + 1))
+            setStart((pre) => (pre >= data.products.length - 3 ? pre : pre + 1))
           }
           className="hover:bg-slate-50/15  duration-300 scale-[1.4]"
         />

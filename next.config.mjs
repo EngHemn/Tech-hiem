@@ -1,5 +1,4 @@
 import createNextIntlPlugin from "next-intl/plugin";
-import withPWA from "next-pwa";
 
 /** @type {import('next').NextConfig} */
 
@@ -21,15 +20,14 @@ const nextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 };
 
-// Combine both plugins (PWA & Intl)
-export default withNextIntl(
-  withPWA({
-    dest: "public",
-    register: true,
-    skipWaiting: true,
-  })(nextConfig)
-);
+export default withNextIntl(nextConfig);

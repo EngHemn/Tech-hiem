@@ -52,7 +52,7 @@ const FooterItem = ({ lang }: { lang: boolean }) => {
               className={`flex items-center ${lang ? "flex-row" : "flex-row "}   md:text-8 lg:text-10 group cursor-pointer hover:underline hover:text-blue-400 hover:underline-offset-4 w-full   gap-2`}
             >
               {data.icon && (
-                <p className="mr-2">
+                <span className="mr-2">
                   {data.icon === "phone" ? (
                     <FaPhoneVolume className="group-hover:text-blue-400 w-4 h-4 text-white" />
                   ) : data.icon === "location" ? (
@@ -60,13 +60,13 @@ const FooterItem = ({ lang }: { lang: boolean }) => {
                   ) : (
                     <MdOutlineMailOutline className="group-hover:text-blue-400 w-4 h-4" />
                   )}
-                </p>
+                </span>
               )}
-              <p
+              <span
                 className={`text-[14px] w-full ${lang ? "text-right " : "text-left "} `}
               >
                 {data.name}
-              </p>
+              </span>
             </p>
           ))}
         </div>

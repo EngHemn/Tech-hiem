@@ -19,7 +19,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { format } from "path";
 import Link from "next/link";
-import { queryClient } from "@/app/[locale]/ClientProviders";
+import { queryClient } from "@/app/ClientProviders";
 export default function NotificationDropdown() {
   const formatOrderDate = (seconds: number) => {
     try {
