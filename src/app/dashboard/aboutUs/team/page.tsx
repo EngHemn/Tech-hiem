@@ -8,13 +8,13 @@ import {
   deleteTeam,
   setMemeber,
   UpdateTeam,
-  uploadImage,
-} from "@/lib/action/uploadimage";
-import { teamProps } from "@/lib/action";
+} from "@/set-data/firebase";
+import { uploadImage } from "@/set-data/upload";
+import { teamProps } from "@/types";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { z } from "zod";
-import { getAllTeam } from "@/lib/action/dashboard";
+import { getAllTeam } from "@/get-data/firebase";
 import { Loader2, Upload, X } from "lucide-react";
 
 const Page = () => {

@@ -16,9 +16,10 @@ import {
 } from "lucide-react";
 import { selectedProduct } from "@/lib/store/filterProducts";
 import { format } from "date-fns";
-import { doc, getDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
-import { ProductFormInput } from "@/lib/action";
+import { ProductFormInput } from "@/types";
+import { getProductById } from "@/get-data/firebase";
+import { deleteProduct } from "@/set-data/firebase";
 import {
   Dialog,
   DialogContent,
@@ -59,21 +60,9 @@ const ProductReviewPage = ({ params }) => {
       setIsLoading(true);
 
       try {
-        // Try to fetch from Products collection first
-        let productDoc = await getDoc(doc(db, "Products", productId));
-        let isPrivate = false;
+        const { product: productData, isPrivate } = await getProductById(productId);
 
-        // If not found, try PrivateProducts collection
-        if (!productDoc.exists()) {
-          productDoc = await getDoc(doc(db, "PrivateProducts", productId));
-          isPrivate = true;
-        }
-
-        if (productDoc.exists()) {
-          const productData = {
-            id: productDoc.id,
-            ...productDoc.data(),
-          } as ProductFormInput;
+        if (productData) {
           setProduct(productData);
           setIsPrivateProduct(isPrivate);
           // Update the store as well for consistency
@@ -119,8 +108,7 @@ const ProductReviewPage = ({ params }) => {
 
     setIsDeleting(true);
     try {
-      const collectionName = isPrivateProduct ? "PrivateProducts" : "Products";
-      await deleteDoc(doc(db, collectionName, product.id));
+      await deleteProduct(product.id || "", isPrivateProduct);
       setShowDeleteDialog(false);
       router.push("/dashboard/Products"); // Redirect to products list
     } catch (error) {

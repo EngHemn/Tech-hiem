@@ -49,7 +49,7 @@ export const getAllOrder = async (): Promise<OrderType[]> => {
   const getorder = await getDocs(collection(db, "order"));
   const data: OrderType[] = [];
   getorder.forEach((item) =>
-    data.push({ ...(item.data() as OrderType), id: item.id })
+    data.push({ ...(item.data() as OrderType), id: item.id }),
   );
   return data;
 };
@@ -57,7 +57,7 @@ export const getAllTeam = async (): Promise<teamProps[]> => {
   const data = await getDocs(collection(db, "team"));
   const result: teamProps[] = [];
   data.forEach((item) =>
-    result.push({ ...(item.data() as teamProps), id: item.id })
+    result.push({ ...(item.data() as teamProps), id: item.id }),
   );
   return result;
 };
@@ -165,6 +165,7 @@ export const getOrder = async (userid: string): Promise<OrderType[]> => {
   });
   return newProducts;
 };
+
 export const getProductsBYDiscountAndCategoryAndSale = async ({
   col,
   category,
@@ -183,18 +184,18 @@ export const getProductsBYDiscountAndCategoryAndSale = async ({
               collection(db, "Products"),
               where("category", "==", category), // ✅ Correct placement
               orderBy(col, "desc"),
-              limit(limitParam)
+              limit(limitParam),
             )
           : query(
               collection(db, "Products"),
               where("category", "==", category), // ✅ Correct placement
-              orderBy(col, "desc")
+              orderBy(col, "desc"),
             )
         : limitParam
           ? query(
               collection(db, "Products"),
               orderBy(col, "asc"),
-              limit(limitParam)
+              limit(limitParam),
             )
           : query(collection(db, "Products"), orderBy(col, "asc"));
   } else if (col !== "discount") {
@@ -205,18 +206,18 @@ export const getProductsBYDiscountAndCategoryAndSale = async ({
               collection(db, "Products"),
               where("category", "==", category), // ✅ Correct placement
               orderBy(col, "desc"),
-              limit(limitParam)
+              limit(limitParam),
             )
           : query(
               collection(db, "Products"),
               where("category", "==", category), // ✅ Correct placement
-              orderBy(col, "desc")
+              orderBy(col, "desc"),
             )
         : limitParam
           ? query(
               collection(db, "Products"),
               orderBy(col, "desc"),
-              limit(limitParam)
+              limit(limitParam),
             )
           : query(collection(db, "Products"), orderBy(col, "desc"));
   } else {
@@ -227,18 +228,18 @@ export const getProductsBYDiscountAndCategoryAndSale = async ({
               collection(db, "Products"),
               where("category", "==", category), // ✅ Correct placement
               where("isDiscount", "==", true),
-              limit(limitParam)
+              limit(limitParam),
             )
           : query(
               collection(db, "Products"),
               where("category", "==", category), // ✅ Correct placement
-              where("isDiscount", "==", true)
+              where("isDiscount", "==", true),
             )
         : limitParam
           ? query(
               collection(db, "Products"),
               where("isDiscount", "==", true),
-              limit(limitParam)
+              limit(limitParam),
             )
           : query(collection(db, "Products"), where("isDiscount", "==", true));
   }
@@ -262,7 +263,7 @@ export const deleteBlog = async (id: string) => {
 export const getnotification_admin = async () => {
   const data = await query(
     collection(db, "notifications_admin"),
-    where("read", "==", false)
+    where("read", "==", false),
   );
   const querySnapshot = await getDocs(data);
   const result: NotificationData[] = [];

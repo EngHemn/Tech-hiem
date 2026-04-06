@@ -1,7 +1,7 @@
 "use client";
-import { uploadImage } from "@/lib/action/uploadimage";
-import { catagoryProps } from "@/lib/action";
-import { colors as availableColors } from "@/util/data";
+import { uploadImage } from "@/set-data/upload";
+import { catagoryProps } from "@/types";
+import { colors as availableColors } from "@/get-data/static-data";
 import Image from "next/image";
 import React, { FormEvent, useRef, useState } from "react";
 import { MdOutlineDelete } from "react-icons/md";

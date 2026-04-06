@@ -2,14 +2,14 @@
 import CardContactUs from "@/components/contactus/CardContactUs";
 import LoadingSpinner from "@/components/contactus/LoadingSpinner";
 import { useToast } from "@/hooks/use-toast";
+import { getConactUs } from "@/get-data/firebase";
 import {
   addContactUs,
   deleteContactUs,
-  getConactUs,
   UpdateContactUUs,
-  uploadImage,
-} from "@/lib/action/uploadimage";
-import { contactUSProps } from "@/lib/action";
+} from "@/set-data/firebase";
+import { uploadImage } from "@/set-data/upload";
+import { contactUSProps } from "@/types";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { z } from "zod";

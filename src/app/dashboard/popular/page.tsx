@@ -2,9 +2,9 @@
 import { queryClient } from "@/app/ClientProviders";
 import NewProducts from "@/components/home/NewProducts";
 import { db } from "@/config/firebaseConfig";
-import { ProductFormInput } from "@/lib/action";
+import { ProductFormInput } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { getPopularProducts } from "@/get-data/firebase";
 import { useState } from "react";
 import { FaHeart, FaSearch, FaTag } from "react-icons/fa";
 
@@ -21,16 +21,7 @@ const Page = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["popularProducts", select],
     queryFn: async () => {
-      const productQuery = query(
-        collection(db, "Products"),
-        orderBy(select.order, "desc")
-      );
-      const qSnapShot = await getDocs(productQuery);
-      const products = qSnapShot.docs.map((doc) => ({
-        ...(doc.data() as ProductFormInput),
-        id: doc.id,
-      }));
-
+      const products = await getPopularProducts(select.order);
       return { products, allProducts: products };
     },
   });

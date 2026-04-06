@@ -7,7 +7,8 @@ import Hero from "@/components/home/Hero";
 import Reklam from "@/components/home/Reklam";
 import Sales from "@/components/home/Sales";
 import Servies from "@/components/home/Servies";
-import { lang, setUser } from "@/lib/action/uploadimage";
+import { lang } from "@/get-data/firebase";
+import { setUser } from "@/set-data/firebase";
 import { useUser } from "@clerk/nextjs";
 
 import Link from "next/link";

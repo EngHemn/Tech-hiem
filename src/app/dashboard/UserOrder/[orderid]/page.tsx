@@ -3,8 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { doc, getDoc, getFirestore } from "firebase/firestore";
-import { app } from "@/config/firebaseConfig";
+import { app } from "@/config/firebaseConfig"; // Removed 'db' from here
+import { OrderType } from "@/types";
+import { doc, getDoc, getFirestore } from "firebase/firestore"; // Added getFirestore, doc, getDoc
+import { getOrderById } from "@/get-data/firebase";
 import {
   GoogleMap,
   LoadScript,
@@ -13,35 +15,6 @@ import {
 } from "@react-google-maps/api";
 
 const libraries: "places"[] = ["places"];
-export type OrderType = {
-  id?: string;
-  userId: string;
-  fullName: string;
-  lat: number;
-  lng: number;
-  phoneNumber: string;
-  address: {
-    streetName: string;
-    city: string;
-    region: string;
-  };
-  email: { emailAddress: string }[];
-  orderItems: ItemCartProps[];
-  orderDate: Date;
-  totalAmount: number;
-  totaldiscountPrice: number;
-  note?: string;
-};
-
-export interface ItemCartProps {
-  name: string;
-  id: string;
-  discount?: number;
-  price: number;
-  colors: { name: string; color: string };
-  quantity: number;
-  image: string;
-}
 
 const OrderPage = ({ params }) => {
   const param: { orderid: string } = React.use(params);
@@ -52,13 +25,13 @@ const OrderPage = ({ params }) => {
   useEffect(() => {
     const getData = async () => {
       if (!param.orderid) return;
-      const refdoc = await getDoc(doc(db, "order", param.orderid));
-      if (refdoc.exists()) {
-        setOrder(refdoc.data() as OrderType);
+      const data = await getOrderById(param.orderid);
+      if (data) {
+        setOrder(data);
       }
     };
     getData();
-  }, [param.orderid, db]);
+  }, [param.orderid]);
 
   if (!order) {
     return (

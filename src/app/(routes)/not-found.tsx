@@ -52,7 +52,7 @@ export default function NotFound() {
               Oops! Page Not Found
             </CardDescription>
             <p className="text-muted-foreground mt-2 text-base md:text-lg">
-              The page you're looking for doesn't exist or has been moved to a
+              The page you&apos;re looking for doesn&apos;t exist or has been moved to a
               different location.
             </p>
           </CardHeader>

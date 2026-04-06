@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import InputCheckout from "@/components/Cart/InputCheckout";
-import { catagoryProps, ProductFormInput } from "@/lib/action";
+import { catagoryProps, ProductFormInput } from "@/types";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -15,17 +15,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  getFirestore,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
-import { app } from "@/config/firebaseConfig";
-import { getFireBase, uploadImage } from "@/lib/action/uploadimage";
+import { db } from "@/config/firebaseConfig";
+import { addCategory, createNotification, updateProduct, addProduct } from "@/set-data/firebase";
+import { getProductById } from "@/get-data/firebase";
+import { serverTimestamp, addDoc, collection } from "firebase/firestore";
+import { getFireBase } from "@/get-data/firebase";
+import { uploadImage } from "@/set-data/upload";
 import { IoMdArrowDropdown } from "react-icons/io";
 import ImageSmallInput from "@/components/ImageSmallInput";
 import { useToast } from "@/hooks/use-toast";
@@ -136,7 +131,6 @@ const Page = () => {
     null
   );
   const { toast } = useToast();
-  const db = getFirestore(app);
 
   // Get current user info from localStorage (assuming user is stored there)
   const getUserInfo = () => {
@@ -153,29 +147,6 @@ const Page = () => {
     return { id: "unknown", email: "unknown@example.com" };
   };
 
-  // Create notification function
-  const createNotification = async (
-    productId: string,
-    productName: string,
-    action: "added" | "updated" | "deleted"
-  ) => {
-    try {
-      const user = getUserInfo();
-      const notification: Notification = {
-        productId,
-        productName,
-        action,
-        timestamp: serverTimestamp(),
-        seen: false,
-        userId: user.id,
-        userEmail: user.email,
-      };
-
-      await addDoc(collection(db, "notifications"), notification);
-    } catch (error) {
-      console.error("Error creating notification:", error);
-    }
-  };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -277,19 +248,16 @@ const Page = () => {
 
       // Update or create document based on if we have an ID
       if (haveId) {
-        await updateDoc(doc(db, "Products", haveId), { ...sanitizedData });
-        await createNotification(haveId, data.name, "updated");
+        await updateProduct(haveId, sanitizedData);
+        await createNotification({ productId: haveId, productName: data.name, action: "updated", ...getUserInfo() });
         toast({
           title: "Product Updated",
           description: `${data.name} has been successfully updated.`,
           variant: "default",
         });
       } else {
-        const docRef = await addDoc(
-          collection(db, isProduction ? "Products" : "PrivateProducts"),
-          data
-        );
-        await createNotification(docRef.id, data.name, "added");
+        const productId = await addProduct(data, isProduction);
+        await createNotification({ productId, productName: data.name, action: "added", ...getUserInfo() });
         toast({
           title: "Product Added",
           description: `${data.name} has been successfully added to the catalog.`,
@@ -475,9 +443,9 @@ const Page = () => {
   useEffect(() => {
     const getdata = async () => {
       try {
-        const docSnap = await getDoc(doc(db, "Products", haveId));
-        if (docSnap.exists()) {
-          const productData = docSnap.data();
+        const result = await getProductById(haveId);
+        if (result.product) {
+          const productData = result.product;
           setSelectedCategory(productData.category);
           setName(productData.name);
           setIniPrice(productData.iniPrice);
@@ -491,7 +459,7 @@ const Page = () => {
           setIsDiscount(productData.isDiscount || false);
           setDiscountValue(productData.discount || 0);
           setBrand(productData.brand);
-          setIsProduction(productData.isProduction !== false);
+          setIsProduction(!result.isPrivate);
         } else {
           toast({
             title: "Product Not Found",
@@ -513,7 +481,7 @@ const Page = () => {
       getdata();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [haveId]);
+  }, [haveId, toast]);
 
   const editDetail = (index: number) => {
     const detail = details[index];

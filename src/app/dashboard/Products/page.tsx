@@ -23,7 +23,7 @@ import { BsFilterLeft } from "react-icons/bs";
 // Import your utility functions from the separate fi
 
 // Import types
-import type { ProductFormInput } from "@/lib/action";
+import type { ProductFormInput } from "@/types";
 
 // Define the ProductTab type
 type ProductTab = "in-stock" | "out-stock" | "private" | "manufacturer";

@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { OrderType } from "@/lib/action";
-import { getAllOrder } from "@/lib/action/uploadimage";
-import { doc, updateDoc } from "firebase/firestore";
+import { OrderType } from "@/types";
+import { getAllOrders } from "@/get-data/firebase";
 import { db } from "@/config/firebaseConfig";
+import { updateOrder } from "@/set-data/firebase";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 // UI Components
@@ -68,7 +68,7 @@ const OrderHistoryPage = () => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const data = await getAllOrder();
+        const data = await getAllOrders();
         setOrders(data as OrderType[]);
         setAllOrders(data as OrderType[]);
       } catch (error) {
@@ -216,8 +216,7 @@ const OrderHistoryPage = () => {
       );
 
       // Update in Firebase
-      await updateDoc(doc(db, "order", order.id), {
-        ...order,
+      await updateOrder(order.id || "", {
         view: !order.view,
       });
     } catch (error) {

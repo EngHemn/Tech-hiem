@@ -4,8 +4,8 @@
 import { use, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { BlogProps } from "@/lib/action";
-import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { BlogProps } from "@/types";
+import { getBlogById } from "@/get-data/firebase";
 import { app } from "@/config/firebaseConfig";
 import ReactPlayer from "react-player";
 import { useRouter } from "next/navigation";
@@ -14,19 +14,17 @@ const BlogReviewPage = ({ params }) => {
   const param: any = use(params);
   const id = param.id;
   const [blog, setBlog] = useState<BlogProps | null>(null);
-  const db = getFirestore(app);
   const router = useRouter();
   useEffect(() => {
     if (id) {
-      const fetchProduct = async () => {
-        const getdata = await getDoc(doc(db, "blogs", id));
-        const data = getdata.data();
-        setBlog(data as BlogProps);
+      const fetchBlog = async () => {
+        const data = await getBlogById(id);
+        setBlog(data);
       };
 
-      fetchProduct();
+      fetchBlog();
     }
-  }, [id, db]);
+  }, [id]);
 
   if (!blog) {
     return (

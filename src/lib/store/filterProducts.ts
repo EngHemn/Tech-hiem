@@ -1,10 +1,9 @@
-import { create } from "zustand";
 import {
   FilterProps,
   OrderType,
   ProductFormInput,
   typeFilter,
-} from "../action";
+} from "@/types";
 import {
   collection,
   deleteDoc,

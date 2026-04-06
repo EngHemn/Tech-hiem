@@ -1,11 +1,8 @@
 "use client";
 import { useToast } from "@/hooks/use-toast";
-import {
-  getAboutUs,
-  setAbouut,
-  updateAbout,
-  uploadImage,
-} from "@/lib/action/uploadimage";
+import { getAboutUs } from "@/get-data/firebase";
+import { setAbouut, updateAbout } from "@/set-data/firebase";
+import { uploadImage } from "@/set-data/upload";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
@@ -175,16 +172,15 @@ const Page = () => {
           ) : (
             <>
               <h2 className="font-semibold text-16 sm:text-20 ">
-                Some of Tech Heim's impressive features :{" "}
+                Some of Tech Heim&apos;s impressive features:{" "}
               </h2>
               <p className="text-neutral-400 px-3 dark:text-neutral-600  text-12 sm:text-18 indent-2 ">
-                Diverse digital gadgets for purchase in cash or installments A
+                Diverse digital gadgets for purchase in cash or installments. A
                 blog with reviews and articles about the latest technology and
-                gadgets User comments and Q&A section for community interaction
-                Represents a tech-savvy home with all necessary technology
-                Easy-to-use interface for a great user experience Consistent and
-                visually appealing design A hub for tech enthusiasts to connect
-                and share insights Helps users make informed purchase decisions
+                gadgets. User comments and Q&A section for community interaction.
+                Easy-to-use interface for a great user experience. Consistent and
+                visually appealing design. A hub for tech enthusiasts to connect
+                and share insights. Helps users make informed purchase decisions.
               </p>
             </>
           )}

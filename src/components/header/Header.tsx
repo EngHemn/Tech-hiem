@@ -15,7 +15,7 @@ import {
 } from "@clerk/nextjs";
 import { IoCartOutline } from "react-icons/io5";
 import { useSelector } from "react-redux";
-import { catagoryProps, ItemCartProps } from "@/lib/action";
+import { catagoryProps, ItemCartProps } from "@/types";
 import { usePathname } from "next/navigation";
 import { IoMdMenu } from "react-icons/io";
 import { IoSearchOutline, IoCloseOutline } from "react-icons/io5";
@@ -28,7 +28,7 @@ import {
   SearchCategory,
   search_Team,
   search_User,
-} from "@/lib/action/uploadimage";
+} from "@/get-data/firebase";
 import { useTheme } from "next-themes";
 import SearchResults from "./SearchResults";
 import {

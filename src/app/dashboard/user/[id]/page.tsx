@@ -1,7 +1,7 @@
 "use client";
 
-import { getOrder, getUserById } from "@/lib/action/dashboard";
-import { getfavorite, getSaveBlog } from "@/lib/action/fovarit";
+import { getOrder, getUserById } from "@/get-data/firebase";
+import { getfavorite, getSaveBlog } from "@/get-data/firebase";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -9,7 +9,7 @@ import { redirect, useRouter } from "next/navigation";
 import { use, useState, useEffect } from "react";
 import { ChevronLeft, Heart, BookOpen, ShoppingBag, User2 } from "lucide-react";
 import ReactPlayer from "react-player";
-import { OrderType, userProps, UserType } from "@/lib/action";
+import { OrderType, userProps, UserType } from "@/types";
 import type { User } from "../page";
 import { selectedOrder } from "@/lib/store/filterProducts";
 

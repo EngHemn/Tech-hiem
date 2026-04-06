@@ -1,8 +1,8 @@
 "use client";
 import { motion } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
-import { getFireBase } from "@/lib/action/uploadimage";
-import { catagoryProps } from "@/lib/action";
+import { getFireBase } from "@/get-data/firebase";
+import { catagoryProps } from "@/types";
 import { Skeleton } from "../ui/skeleton";
 import useFilterProducts from "@/lib/store/filterProducts";
 import gsap from "gsap";

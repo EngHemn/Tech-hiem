@@ -6,9 +6,9 @@ import {
   getAllProducts,
   getAllTeam,
   getAllUsers,
-} from "@/lib/action/dashboard";
-import { getAllSaveBlog } from "@/lib/action/fovarit";
-import { getAllOrder } from "@/lib/action/uploadimage";
+  getAllSaveBlog,
+  getAllOrders as getAllOrder,
+} from "@/get-data/firebase";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";

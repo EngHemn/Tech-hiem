@@ -5,7 +5,7 @@ import React from "react";
 
 import useFilterProducts from "@/lib/store/filterProducts";
 import { useQuery } from "@tanstack/react-query";
-import { getProductsBYDiscountAndCategoryAndSale } from "@/lib/action/dashboard";
+import { getProductsBYDiscountAndCategoryAndSale } from "@/get-data/firebase";
 const Page = () => {
   const { setCategory: setcategory, category, resetAll } = useFilterProducts();
   const {

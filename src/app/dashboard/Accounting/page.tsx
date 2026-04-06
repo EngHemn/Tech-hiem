@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   LineChart,
   Line,
@@ -10,54 +10,12 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  query,
-  where,
-  Timestamp,
-} from "firebase/firestore";
+import { app, db } from "@/config/firebaseConfig";
+import { OrderType, ProductFormInput } from "@/types";
+import { getAllOrders, getAllProducts } from "@/get-data/firebase";
 import dayjs from "dayjs";
 
-// ---------- Types ----------
-interface ItemCartProps {
-  id: string;
-  quantity: number;
-  price: number;
-  discount?: number;
-}
-
-interface OrderType {
-  id: string;
-  userId: string;
-  fullName: string;
-  lat: number;
-  lng: number;
-  phoneNumber: string;
-  address: {
-    streetName: string;
-    city: string;
-    region: string;
-  };
-  email: { emailAddress: string }[];
-  orderItems: ItemCartProps[];
-  orderDate: Timestamp;
-  totalAmount: number;
-  totaldiscountPrice: number;
-  note?: string;
-  view: boolean;
-}
-
-interface ProductType {
-  id: string;
-  iniPrice: number;
-  price: number;
-  // Other product fields that might be in your database
-  name?: string;
-  description?: string;
-  category?: string;
-}
+// Local types for accounting reports
 
 interface MonthlyReport {
   month: string;
@@ -94,8 +52,8 @@ const MONTH_NAMES = [
 const AccountingPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [orders, setOrders] = useState<OrderType[]>([]);
-  const [products, setProducts] = useState<ProductType[]>([]);
-  const [privateProducts, setPrivateProducts] = useState<ProductType[]>([]);
+  const [products, setProducts] = useState<ProductFormInput[]>([]);
+  const [privateProducts, setPrivateProducts] = useState<ProductFormInput[]>([]);
   // We don't need monthlyReports state anymore as we calculate it directly
   const [yearlyReports, setYearlyReports] = useState<YearlyReport[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<number>(
@@ -105,98 +63,45 @@ const AccountingPage = () => {
     new Date().getFullYear()
   );
   const [loadingError, setLoadingError] = useState<string | null>(null);
+  const [financialData, setFinancialData] = useState<YearlyReport[]>([]); // New state for yearly chart data
+  const [performance, setPerformance] = useState<{ revenue: number; cost: number; profit: number; } | null>(null); // New state for current month/year performance
 
   // Current year for reference
   const currentYear = new Date().getFullYear();
 
-  // Helper function to fetch data from Firestore
-  const fetchFirestoreData = async () => {
-    try {
-      setIsLoading(true);
-      setLoadingError(null);
-
-      const db = getFirestore();
-
-      // Fetch orders
-      const ordersCollection = collection(db, "order");
-      const ordersSnapshot = await getDocs(ordersCollection);
-      const ordersData = ordersSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as OrderType[];
-
-      // Fetch products (for sale)
-      const productsCollection = collection(db, "Products");
-      const productsSnapshot = await getDocs(productsCollection);
-      const productsData = productsSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as ProductType[];
-
-      // Fetch private products (not for sale)
-      const privateProductsCollection = collection(db, "PrivateProducts");
-      const privateProductsSnapshot = await getDocs(privateProductsCollection);
-      const privateProductsData = privateProductsSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as ProductType[];
-
-      // Set state with fetched data
-      setOrders(ordersData);
-      setProducts(productsData);
-      setPrivateProducts(privateProductsData);
-
-      // Process the fetched data
-      processFinancialData(ordersData, [
-        ...productsData,
-        ...privateProductsData,
-      ]);
-    } catch (error) {
-      console.error("Error fetching data from Firestore:", error);
-      setLoadingError(
-        "Failed to load data from database. Please try again later."
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // Helper function to calculate financial totals
-  const calculateTotals = (
-    filteredOrders: OrderType[],
-    allProducts: ProductType[]
-  ) => {
-    let revenue = 0;
-    let cost = 0;
+  const calculateTotals = useCallback(
+    (filteredOrders: OrderType[], allProducts: ProductFormInput[]) => {
+      let revenue = 0;
+      let cost = 0;
 
-    filteredOrders.forEach((order) => {
-      order.orderItems.forEach((item) => {
-        const product = allProducts.find((p) => p.id === item.id);
-        if (product) {
-          const itemRevenue =
-            (item.price - (item.discount || 0)) * item.quantity;
-          const itemCost = product.iniPrice * item.quantity;
+      filteredOrders.forEach((order) => {
+        order.orderItems.forEach((item) => {
+          const product = allProducts.find((p) => p.id === item.id);
+          if (product) {
+            const itemRevenue =
+              (item.price - (item.discount || 0)) * item.quantity;
+            const itemCost = product.iniPrice * item.quantity;
 
-          revenue += itemRevenue;
-          cost += itemCost;
-        }
+            revenue += itemRevenue;
+            cost += itemCost;
+          }
+        });
       });
-    });
 
-    return {
-      revenue: Number(revenue.toFixed(2)),
-      cost: Number(cost.toFixed(2)),
-      profit: Number((revenue - cost).toFixed(2)),
-    };
-  };
+      return {
+        revenue: Number(revenue.toFixed(2)),
+        cost: Number(cost.toFixed(2)),
+        profit: Number((revenue - cost).toFixed(2)),
+      };
+    },
+    []
+  );
 
   // Process financial data for monthly and yearly reports
-  const processFinancialData = (
-    ordersData: OrderType[],
-    allProducts: ProductType[]
-  ) => {
-    // Process yearly data only for the yearly chart
-    const processYearlyData = () => {
+  const processFinancialData = useCallback(
+    (ordersData: OrderType[], allProducts: ProductFormInput[]) => {
+      // Process yearly data
       const years = [
         currentYear - 4,
         currentYear - 3,
@@ -204,52 +109,54 @@ const AccountingPage = () => {
         currentYear - 1,
         currentYear,
       ];
-      const yearlyData: YearlyReport[] = [];
-
-      years.forEach((year) => {
-        let yearlyRevenue = 0;
-        let yearlyCost = 0;
-
-        // Filter orders for this year
-        const yearOrders = ordersData.filter(
-          (order) => order.orderDate.toDate().getFullYear() === year
-        );
-
-        // Calculate totals directly
-        yearOrders.forEach((order) => {
-          order.orderItems.forEach((item) => {
-            const product = allProducts.find((p) => p.id === item.id);
-            if (product) {
-              const itemRevenue =
-                (item.price - (item.discount || 0)) * item.quantity;
-              const itemCost = product.iniPrice * item.quantity;
-
-              yearlyRevenue += itemRevenue;
-              yearlyCost += itemCost;
-            }
-          });
+      
+      const yearlyData = years.map((year) => {
+        const yearOrders = ordersData.filter((order) => {
+          const date = order.orderDate.toDate ? order.orderDate.toDate() : new Date(order.orderDate);
+          return date.getFullYear() === year;
         });
 
-        const yearlyProfit = yearlyRevenue - yearlyCost;
-
-        // Add year data
-        yearlyData.push({
+        const totals = calculateTotals(yearOrders, allProducts);
+        return {
           year,
-          revenue: Number(yearlyRevenue.toFixed(2)),
-          cost: Number(yearlyCost.toFixed(2)),
-          profit: Number(yearlyProfit.toFixed(2)),
-        });
+          revenue: totals.revenue,
+          cost: totals.cost,
+          profit: totals.profit,
+        };
       });
 
-      return yearlyData;
-    };
+      setYearlyReports(yearlyData);
+    },
+    [calculateTotals, currentYear]
+  );
 
-    // Set the yearly report data
-    setYearlyReports(processYearlyData());
+  // Fetch all required data from Firestore
+  const fetchFirestoreData = useCallback(async () => {
+    setIsLoading(true);
+    setLoadingError(null);
 
-    // We don't need monthly reports anymore as we calculate them directly in getYearlyMonthsData
-    // This improves accuracy and ensures all months are properly represented
-  };
+    try {
+      // Use consolidated data layer
+      const [ordersData, productsData, privateProductsData] = await Promise.all([
+        getAllOrders(),
+        getAllProducts(false, false),
+        getAllProducts(true, false),
+      ]);
+
+      // Set state with fetched data
+      setOrders(ordersData);
+      setProducts(productsData);
+      setPrivateProducts(privateProductsData);
+
+      // Process the fetched data
+      processFinancialData(ordersData, [...productsData, ...privateProductsData]);
+    } catch (error) {
+      console.error("Error fetching data from Firestore:", error);
+      setLoadingError("Failed to load data from database. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [processFinancialData]);
 
   // Fetch data on component mount
   useEffect(() => {
@@ -259,7 +166,7 @@ const AccountingPage = () => {
     const now = new Date();
     setSelectedMonth(now.getMonth());
     setSelectedYear(now.getFullYear());
-  }, []);
+  }, [fetchFirestoreData]);
 
   // Get monthly data for all 12 months of the selected year
   const getYearlyMonthsData = () => {

@@ -1,7 +1,8 @@
 "use client";
 import { useToast } from "@/hooks/use-toast";
-import { addFAQ, deleteFAQ, getFAQ, updateFAQ } from "@/lib/action/uploadimage";
-import { faqProps } from "@/lib/action";
+import { getFAQ } from "@/get-data/firebase";
+import { addFAQ, deleteFAQ, updateFAQ } from "@/set-data/firebase";
+import { faqProps } from "@/types";
 import React, { useEffect, useState } from "react";
 import { FaCaretRight } from "react-icons/fa";
 import { z } from "zod";

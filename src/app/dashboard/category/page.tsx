@@ -1,21 +1,14 @@
 "use client";
 import { uploadImage } from "@/lib/action/uploadimage";
-import { catagoryProps } from "@/lib/action";
-import { colors as availableColors } from "@/util/data";
+import { catagoryProps } from "@/types";
+import { colors as availableColors } from "@/get-data/static-data";
 import Image from "next/image";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { FiTrash2, FiEdit, FiPlus, FiX } from "react-icons/fi";
 import { MdColorLens } from "react-icons/md";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  getFirestore,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
-import { app } from "@/config/firebaseConfig";
+import { app, db } from "@/config/firebaseConfig";
+import { getFireBase } from "@/get-data/firebase";
+import { addCategory, updateCategory, deleteCategory } from "@/set-data/firebase";
 import { useToast } from "@/hooks/use-toast";
 
 const ModalCategory = () => {
@@ -42,7 +35,6 @@ const ModalCategory = () => {
   // References
   const nameRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-  const db = getFirestore(app);
 
   // Form validation
   const validateForm = () => {
@@ -73,30 +65,28 @@ const ModalCategory = () => {
     return isValid;
   };
 
-  // Fetch categories on component mount
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
+  // Fetch categories from Firestore
+  const fetchCategories = useCallback(async () => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      const snapshot = await getDocs(collection(db, "category"));
-      const fetchedCategories: catagoryProps[] = [];
-      snapshot.forEach((item) => {
-        fetchedCategories.push(item.data() as catagoryProps);
-      });
-      setCategories(fetchedCategories);
+      const categoriesData = await getFireBase("category"); // Assuming getFireBase still needs "category" argument
+      setCategories(categoriesData); // Using setCategories as per state definition
     } catch (error) {
+      console.error("Error fetching categories:", error);
       toast({
-        title: "Error fetching categories",
-        description: "Please try again later",
+        title: "Error",
+        description: "Failed to load categories. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast]); // Dependency array for useCallback
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]); // Add fetchCategories to dependency array
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -118,17 +108,13 @@ const ModalCategory = () => {
     try {
       setIsLoading(true);
       if (isEditing) {
-        // Delete the old document if name changed
-        if (editId !== categoryName) {
-          await deleteDoc(doc(db, "category", editId));
-        }
-        await setDoc(doc(db, "category", categoryName), categoryData);
+        await updateCategory(editId, categoryData);
         toast({
           title: "Category updated",
           description: `${categoryName} has been updated successfully!`,
         });
       } else {
-        await setDoc(doc(db, "category", categoryName), categoryData);
+        await addCategory(categoryData);
         toast({
           title: "Category added",
           description: `${categoryName} has been added successfully!`,
@@ -229,7 +215,7 @@ const ModalCategory = () => {
     if (confirm(`Are you sure you want to delete "${categoryName}"?`)) {
       try {
         setIsLoading(true);
-        await deleteDoc(doc(db, "category", categoryName));
+        await deleteCategory(categoryName);
         toast({
           title: "Category deleted",
           description: `${categoryName} has been removed`,

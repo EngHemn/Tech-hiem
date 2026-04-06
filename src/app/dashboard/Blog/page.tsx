@@ -2,9 +2,10 @@
 import Link from "next/link";
 import React from "react";
 import Blog from "./_components/Blog";
-import { BlogProps } from "@/lib/action";
+import { BlogProps } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { deleteBlog, getAllBlogs } from "@/lib/action/dashboard";
+import { getAllBlogs } from "@/get-data/firebase";
+import { deleteBlog } from "@/set-data/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/app/ClientProviders";
 import { FaSpinner } from "react-icons/fa";

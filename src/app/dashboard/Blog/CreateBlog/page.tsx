@@ -1,18 +1,14 @@
 "use client";
 
-import { app } from "@/config/firebaseConfig";
-import { useToast } from "@/hooks/use-toast";
 import { handleUpload } from "@/lib/action/blog";
 import { uploadImage } from "@/lib/action/uploadimage";
+import { addBlog, updateBlog } from "@/set-data/firebase";
+import { getBlogById } from "@/get-data/firebase";
+import { BlogProps } from "@/types";
+import { app, db } from "@/config/firebaseConfig";
 import { useUser } from "@clerk/nextjs";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  getFirestore,
-  updateDoc,
-} from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
+import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -124,58 +120,45 @@ const Page = () => {
     }
     if (haveId) {
       // Updating existing blog
-      await updateDoc(doc(db, "blogs", haveId), {
+      await updateBlog(haveId, {
         title: title,
         description: description,
         video: vedeoUrl,
         image: imageUrl,
         type: type,
-        date: new Date(),
-        user: user.fullName,
-        numberOfLikes: Math.floor(Math.random() * 100),
-        numberOfDislikes: 0,
-        numberOfComments: 0,
-        comments: [],
-        numberOfViews: 0,
-        numberOffavorites: 0,
-        numberOfSearches: Math.floor(Math.random() * 100),
+        user: user.fullName || "Admin",
       })
         .then(() => {
           toast({ title: "Blog updated successfully" });
           router.push("/dashboard/Blog");
         })
-        .catch((error) => {});
+        .catch((error) => {
+          console.error("Error updating blog:", error);
+        });
       return;
     }
     // Submitting a new blog
-    await addDoc(collection(db, "blogs"), {
+    await addBlog({
       title: title,
       description: description,
       video: vedeoUrl,
       image: imageUrl,
       type: type,
-      date: new Date(),
-      user: user.fullName,
-      numberOfLikes: Math.floor(Math.random() * 100),
-      numberOfDislikes: 0,
-      numberOfComments: 0,
-      comments: [],
-      numberOfViews: 0,
-      numberOffavorites: 0,
-      numberOfSearches: Math.floor(Math.random() * 100),
+      user: user.fullName || "Admin",
     })
       .then(() => {
         toast({ title: "Blog submitted successfully" });
         router.push("/dashboard/Blog");
       })
-      .catch((error) => {});
+      .catch((error) => {
+        console.error("Error submitting blog:", error);
+      });
   };
 
   useEffect(() => {
     if (haveId) {
       const getData = async () => {
-        const data = await getDoc(doc(db, "blogs", haveId));
-        const blog = data.data();
+        const blog = await getBlogById(haveId);
         if (blog) {
           settitle(blog.title);
           setdescription(blog.description);
@@ -186,7 +169,7 @@ const Page = () => {
       };
       getData();
     }
-  }, [db, haveId]);
+  }, [haveId]);
 
   return (
     <div className="flex flex-col items-center p-6 bg-gray-50 min-h-screen space-y-8">

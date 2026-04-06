@@ -14,8 +14,8 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { app } from "@/config/firebaseConfig";
-import { catagoryProps, ProductFormInput } from "@/lib/action";
-import { Loader2, Plus, Package, Trash2, Image, Video } from "lucide-react";
+import { catagoryProps, ProductFormInput } from "@/types";
+import { Loader2, Plus, Package, Trash2, Image as ImageIcon, Video } from "lucide-react";
 
 const db = getFirestore(app);
 
@@ -2176,7 +2176,7 @@ const BulkDataPage = () => {
           <Card className="shadow-xl border-2 border-purple-500/20 hover:border-purple-500/40 transition-all">
             <CardHeader>
               <CardTitle className="text-2xl font-bold flex items-center gap-2">
-                <Image className="h-6 w-6 text-purple-600" />
+                <ImageIcon className="h-6 w-6 text-purple-600" />
                 Add 10 Blogs with Photos
               </CardTitle>
             </CardHeader>

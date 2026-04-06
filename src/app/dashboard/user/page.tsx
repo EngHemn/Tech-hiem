@@ -6,56 +6,7 @@ import { motion } from "framer-motion";
 import { Link } from "navigation";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-export interface User {
-  id: string;
-  passwordEnabled: boolean;
-  totpEnabled: boolean;
-  backupCodeEnabled: boolean;
-  twoFactorEnabled: boolean;
-  banned: boolean;
-  locked: boolean;
-  createdAt: number;
-  updatedAt: number;
-  imageUrl: string;
-  hasImage: boolean;
-  primaryEmailAddressId: string;
-  primaryPhoneNumberId: string | null;
-  primaryWeb3WalletId: string | null;
-  lastSignInAt: number;
-  externalId: string | null;
-  username: string;
-  firstName: string;
-  lastName: string;
-  publicMetadata: {
-    role: string;
-    [key: string]: any;
-  };
-  privateMetadata: {
-    [key: string]: any;
-  };
-  unsafeMetadata: {
-    [key: string]: any;
-  };
-  emailAddresses: EmailAddress[];
-}
-
-export interface EmailAddress {
-  id: string;
-  emailAddress: string;
-  verification: {
-    status: string;
-    strategy: string;
-    externalVerificationRedirectURL: string | null;
-    attempts: number | null;
-    expireAt: number | null;
-    nonce: string | null;
-    message: string | null;
-  };
-  linkedTo: {
-    id: string;
-    type: string;
-  }[];
-}
+import { DashboardUser } from "@/types";
 
 const UserDashboardPage = () => {
   const { data, isLoading, error } = useQuery({
@@ -122,7 +73,7 @@ const UserDashboardPage = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {data.user.map((user: User) => {
+          {data.user.map((user: DashboardUser) => {
             const email = user.emailAddresses[0]?.emailAddress ?? "N/A";
             return (
               <motion.div
